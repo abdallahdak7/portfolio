@@ -83,7 +83,7 @@ export function Agent() {
   },[status])
 
   return (
-    <section className="py-16 bg-secondary/20 border-y border-border/50 relative overflow-hidden">
+    <section id="agent" className="py-16 bg-secondary/20 border-y border-border/50 relative overflow-hidden">
       <div className="container mx-auto px-6 text-center">
         <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -66,7 +66,11 @@ export function Navbar() {
                 e.preventDefault();
                 scrollToSection(link.href);
               }}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+              className={`text-sm font-medium transition-colors relative group ${
+                isScrolled
+                  ? "text-muted-foreground hover:text-foreground"
+                  : "text-white/80 hover:text-white"
+              }`}
             >
               {link.label}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -75,10 +79,10 @@ export function Navbar() {
           <Button
             variant="default"
             size="sm"
-            onClick={() => scrollToSection("#contact")}
+            onClick={() => scrollToSection("#agent")}
             className="ml-2"
           >
-            Let's Talk
+            Call my agent
           </Button>
         </div>
 
