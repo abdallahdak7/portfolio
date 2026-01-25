@@ -13,6 +13,9 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [pendingScrollTarget, setPendingScrollTarget] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,11 +26,15 @@ export function Navbar() {
   }, []);
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (isMobileMenuOpen) {
+      setPendingScrollTarget(href);
+      setIsMobileMenuOpen(false);
+    } else {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
-    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -36,9 +43,7 @@ export function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "glass border-b border-border/50"
-          : "bg-transparent"
+        isScrolled ? "glass border-b border-border/50" : "bg-transparent"
       }`}
     >
       <nav className="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -49,7 +54,9 @@ export function Navbar() {
             e.preventDefault();
             scrollToSection("#home");
           }}
-          className="font-display font-bold text-xl tracking-tight text-foreground"
+          className={`font-display font-bold text-xl tracking-tight ${
+            isScrolled ? "text-foreground" : "text-white"
+          }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -88,7 +95,9 @@ export function Navbar() {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 text-foreground"
+          className={`md:hidden p-2 ${
+            isScrolled ? "text-foreground" : "text-white"
+          }`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -104,6 +113,15 @@ export function Navbar() {
           opacity: isMobileMenuOpen ? 1 : 0,
         }}
         transition={{ duration: 0.3 }}
+        onAnimationComplete={() => {
+          if (!isMobileMenuOpen && pendingScrollTarget) {
+            const element = document.querySelector(pendingScrollTarget);
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth" });
+            }
+            setPendingScrollTarget(null);
+          }
+        }}
         className="md:hidden overflow-hidden glass border-b border-border/50"
       >
         <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
@@ -123,9 +141,9 @@ export function Navbar() {
           <Button
             variant="default"
             className="w-full mt-2"
-            onClick={() => scrollToSection("#contact")}
+            onClick={() => scrollToSection("#agent")}
           >
-            Let's Talk
+            Call my agent
           </Button>
         </div>
       </motion.div>
