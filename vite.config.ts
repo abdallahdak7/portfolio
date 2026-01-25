@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  base: "/portfolio/",
+  base: "/",
   plugins: [react()],
   resolve: {
     alias: {
