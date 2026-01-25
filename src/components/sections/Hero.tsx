@@ -81,7 +81,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-lg sm:text-xl text-primary-foreground/70 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Building innovative SaaS solutions and high-performance mobile & web applications.
+            Building innovative, high-performance mobile & web applications.
             Specialized in TypeScript, React, and React Native.
           </motion.p>
 
@@ -103,7 +103,7 @@ export function Hero() {
               variant="outline"
               size="lg"
               onClick={() => scrollToSection("#contact")}
-              className="w-full sm:w-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
+              className="w-full sm:w-auto border-primary-foreground/20 text-primary hover:bg-primary-foreground/10"
             >
               Get in Touch
             </Button>
@@ -117,8 +117,8 @@ export function Hero() {
             className="flex items-center justify-center gap-6"
           >
             {[
-              { icon: Github, href: "https://github.com", label: "GitHub" },
-              { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+              { icon: Github, href: "https://github.com/abdallahdak7", label: "GitHub" },
+              { icon: Linkedin, href: "https://linkedin.com/in/abdallah-daknache-frontend", label: "LinkedIn" },
               { icon: Mail, href: "mailto:abdallah.daknache@gmail.com", label: "Email" },
             ].map(({ icon: Icon, href, label }) => (
               <a

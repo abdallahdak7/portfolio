@@ -8,8 +8,8 @@ const footerLinks = [
 ];
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+  { icon: Github, href: "https://github.com/abdallahdak7", label: "GitHub" },
+  { icon: Linkedin, href: "https://linkedin.com/in/abdallah-daknache-frontend", label: "LinkedIn" },
   { icon: Mail, href: "mailto:abdallah.daknache@gmail.com", label: "Email" },
 ];
 

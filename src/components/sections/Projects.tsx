@@ -13,15 +13,7 @@ const projects = [
     category: "Mobile",
     featured: true,
   },
-  {
-    id: 2,
-    title: "TADA Care",
-    description:
-      "Healthcare SaaS platform enabling seamless patient-provider communication and care management with real-time features.",
-    technologies: ["React", "Node.js", "WebSockets", "AWS"],
-    category: "SaaS",
-    featured: true,
-  },
+
   {
     id: 3,
     title: "Pre-Trade Frontend",
@@ -30,15 +22,6 @@ const projects = [
     technologies: ["React", "TypeScript", "REST APIs"],
     category: "Fintech",
     featured: true,
-  },
-  {
-    id: 4,
-    title: "Enterprise Backend Services",
-    description:
-      "Scalable backend architecture using NestJS with advanced system integrations and data processing pipelines.",
-    technologies: ["NestJS", "TypeScript", "Docker", "Terraform"],
-    category: "Backend",
-    featured: false,
   },
   {
     id: 5,
@@ -60,7 +43,7 @@ const projects = [
   },
 ];
 
-const categories = ["All", "Mobile", "SaaS", "Fintech", "Backend", "DevOps"];
+const categories = ["All", "Mobile", "Fintech", "DevOps"];
 
 export function Projects() {
   const ref = useRef(null);
@@ -174,17 +157,6 @@ export function Projects() {
                       {tech}
                     </span>
                   ))}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <ExternalLink size={14} />
-                    View Details
-                  </Button>
-                  <button className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-                    <Github size={18} />
-                  </button>
                 </div>
               </div>
             </motion.article>
