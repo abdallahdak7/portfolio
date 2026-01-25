@@ -103,7 +103,7 @@ export function Agent() {
             </p>
           </div>
 
-          <div className="flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center">
             <div className="relative flex flex-col items-center justify-center min-h-[200px]">
               {status === "connected" ? (
                 <div className="relative">
