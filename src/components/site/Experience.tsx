@@ -1,10 +1,9 @@
-import { experience, profile } from "@/content";
+import { experience } from "@/content";
 import { Section } from "./Section";
 
 export function Experience() {
   return (
-    <Section id="experience" label="01 — Experience" title="Where I've worked">
-      <p className="mb-12 max-w-2xl leading-relaxed text-muted">{profile.summary}</p>
+    <Section id="experience" label="03 — Experience" title="Where I've worked">
       <ol className="space-y-14">
         {experience.map((job) => (
           <li key={job.company} className="relative">

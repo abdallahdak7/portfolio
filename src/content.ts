@@ -3,29 +3,64 @@ export const profile = {
   role: "Senior Mobile Engineer",
   company: "Pepperstone",
   location: "Limassol, Cyprus",
-  availability: "Open to Senior & Lead Mobile roles",
+  availability: "Open to Lead & Senior Mobile roles",
   email: "abdallah.daknache@gmail.com",
   linkedin: "https://www.linkedin.com/in/abdallah-daknache/",
   github: "https://github.com/abdallahdak7",
   resume: "/Abdallah_Daknache_Resume.pdf",
   headline:
-    "I lead React Native delivery on a global trading app, where speed, reliability, and user trust directly affect the business. I turn product goals into fast, stable releases and help the engineers around me level up.",
+    "I lead mobile initiatives on a global trading app, from shaping the problem with product, through architecture and delivery, to production. I work AI-first every day, and I help my team turn AI into faster, better delivery.",
   summary:
-    "7+ years across backend, web, and mobile, progressing from junior backend engineer to senior mobile engineer. Today I own mobile initiatives end to end at Pepperstone, from requirements and architecture through release and production monitoring.",
+    "7+ years across backend, web, and mobile, growing from junior backend engineer to senior mobile engineer. That breadth is what lets me lead across team boundaries today.",
 };
 
 export const glance = [
-  { label: "Experience", value: "7+ years" },
-  { label: "Focus", value: "React Native · TypeScript" },
+  { label: "Experience", value: "7+ years · backend, web, mobile" },
+  { label: "Leadership", value: "Initiative ownership · Mentoring" },
+  { label: "Way of working", value: "AI-first, every day" },
   { label: "Domain", value: "Fintech · Trading" },
-  { label: "Scope", value: "Architecture → Release" },
 ];
 
-export const about = [
-  "Working across the whole stack has taught me that technical decisions reach well beyond the code in front of me. I connect the dots between systems, understand what the product actually needs, and choose solutions that hold up now and in the long run.",
-  "I've led initiatives spanning web and mobile, owning them from planning through delivery. I'm comfortable working through trade-offs with product, design, backend, and QA, and solving problems without adding unnecessary complexity.",
-  "I care about the people side of engineering: mentoring, thorough code reviews, and sharing workflows that make the whole team faster. Good engineering comes from people working well together, not just from good code.",
+export const leadershipIntro =
+  "Working across the whole stack taught me that technical decisions reach well beyond the code. I lead by connecting the dots between systems, people, and product goals, and by choosing solutions that hold up now and in the long run without adding unnecessary complexity.";
+
+export const principles = [
+  {
+    title: "Own the outcome, not just the code",
+    body: "I take initiatives from requirements and architecture through release, and stay accountable for how they perform once they're in users' hands.",
+  },
+  {
+    title: "Align people around clear trade-offs",
+    body: "I work with product, design, backend, and QA to agree on scope, make trade-offs explicit, and keep stakeholders informed on decisions, dependencies, and risks.",
+  },
+  {
+    title: "Grow the engineers around me",
+    body: "Through mentoring, technical guidance, and code reviews that teach rather than gatekeep, I help teammates build judgment, not just ship tickets.",
+  },
+  {
+    title: "Improve how the team works",
+    body: "I put practices in place that scale beyond me, such as making app performance measurable so the team and product can prioritise with data instead of opinions.",
+  },
 ];
+
+export const ai = {
+  intro:
+    "AI is part of how I work every day, not an experiment. I use it across the whole delivery cycle, and as a lead I focus on turning individual productivity into team capability, safely, in a regulated fintech environment.",
+  pillars: [
+    {
+      title: "Across my daily workflow",
+      body: "From planning and breaking down work, to writing and refactoring code with AI agents, debugging, tests, code review, and documentation. AI handles the repetitive parts so I can spend my time on decisions.",
+    },
+    {
+      title: "Leading team adoption",
+      body: "I build and share reusable AI-assisted workflows with my team, helping engineers adopt them in their own work and lifting the team's delivery speed rather than just my own.",
+    },
+    {
+      title: "With judgment and guardrails",
+      body: "AI speeds up the work; engineers stay accountable for it. Output is reviewed and tested like any other code, with care for security, privacy, and compliance in a regulated product.",
+    },
+  ],
+};
 
 export type Role = { title: string; period: string; points?: string[] };
 export type Job = {
@@ -46,23 +81,23 @@ export const experience: Job[] = [
         title: "Senior Mobile Engineer",
         period: "Aug 2024 — Present",
         points: [
-          "Own mobile initiatives end to end, from requirements and architecture to release, balancing product priorities, technical trade-offs, and long-term maintainability.",
-          "Drive cross-functional delivery with product, design, backend, and QA, keeping stakeholders aligned on scope, dependencies, risks, and progress.",
-          "Raise the team's engineering bar through mentoring and code reviews, and share reusable AI-assisted development workflows that make the team faster.",
+          "Lead mobile initiatives end to end, from shaping requirements with product through architecture, delivery, and release, balancing business priorities, technical trade-offs, and long-term maintainability.",
+          "Align engineering, product, design, and QA on scope, dependencies, and risks, and keep stakeholders informed on decisions and progress.",
+          "Mentor engineers through technical guidance and code reviews that build judgment, not just catch bugs.",
+          "Use AI across my daily workflow and lead its adoption in the team, building and sharing reusable AI-assisted workflows that make engineers more efficient.",
         ],
       },
       {
         title: "Mobile Engineer",
         period: "Jul 2022 — Jul 2024",
         points: [
-          "Shipped React Native and TypeScript features for a production trading app with real-time market data, where responsiveness and reliability are business-critical.",
-          "Improved runtime performance by profiling rendering and app-lifecycle issues with Hermes tooling and eliminating unnecessary re-renders.",
-          "Built a native iOS module to measure app startup time, giving the team a performance baseline to track regressions and prioritise fixes.",
-          "Set up production observability and product analytics (Sentry, Datadog, Segment) and supported automated CI/CD builds and App Store / Google Play releases.",
+          "Delivered features for a production React Native trading app where responsiveness and reliability are business-critical.",
+          "Made app performance measurable by introducing startup-time tracking, then resolved rendering bottlenecks, so performance work could be prioritised on data.",
+          "Strengthened production readiness through monitoring, analytics, and automated CI/CD releases.",
         ],
       },
     ],
-    stack: ["React Native", "TypeScript", "Native iOS", "WebSockets", "Sentry", "Datadog", "CI/CD"],
+    stack: ["Mobile leadership", "React Native", "TypeScript", "Native iOS", "AI-assisted development", "CI/CD"],
   },
   {
     company: "EverestCM",
@@ -112,74 +147,28 @@ export const experience: Job[] = [
   },
 ];
 
-export type CaseStudy = {
-  title: string;
-  tag: string;
-  /** Optional headline result, e.g. "−35% cold start". Add real numbers here when available. */
-  metric?: string;
-  problem: string;
-  role: string;
-  approach: string;
-  outcome: string;
-  stack: string[];
-};
-
-export const caseStudies: CaseStudy[] = [
-  {
-    title: "Startup performance visibility",
-    tag: "Native iOS · Performance",
-    problem:
-      "Slow launches cost traders time at the moments that matter, but the team had no reliable way to measure startup time, so performance work was based on guesswork.",
-    role: "Built the native module end to end.",
-    approach:
-      "Wrote a native iOS module that captures startup timings and reports them to the app's analytics pipeline, so every release can be measured against a baseline.",
-    outcome:
-      "Startup time became a tracked metric. The team can now spot regressions per release and prioritise performance fixes using data instead of anecdotes.",
-    stack: ["Native iOS", "React Native", "Analytics"],
-  },
-  {
-    title: "Rendering performance on trading screens",
-    tag: "React Native · Performance",
-    problem:
-      "Screens fed by real-time market data were re-rendering far more than needed, risking dropped frames and a sluggish feel when markets move fast.",
-    role: "Investigated the root causes and implemented the fixes.",
-    approach:
-      "Profiled with Hermes and React DevTools, traced unnecessary renders through state and app-lifecycle handling, and restructured components and subscriptions.",
-    outcome:
-      "Fewer wasted renders and a more responsive app when market data is moving fast.",
-    stack: ["React Native", "Hermes", "TypeScript", "WebSockets"],
-  },
-  {
-    title: "Production observability & release quality",
-    tag: "Reliability · Delivery",
-    problem:
-      "In a regulated trading product, issues have to be caught early and diagnosed fast, and product decisions need real usage data.",
-    role: "Integrated the tooling and supported the release pipeline.",
-    approach:
-      "Integrated Sentry for crash and error tracking, Datadog for monitoring, and Segment for analytics, alongside automated CI/CD builds, feature flags, and store releases.",
-    outcome:
-      "Faster detection and diagnosis of production issues, safer rollouts, and data-informed product decisions.",
-    stack: ["Sentry", "Datadog", "Segment", "CI/CD", "Feature flags"],
-  },
-];
-
 export const skills = [
   {
-    group: "Mobile",
-    items: ["React Native", "New Architecture (Fabric, TurboModules, JSI)", "Hermes", "Native iOS modules", "Xcode", "Android Studio"],
+    group: "Leadership",
+    items: ["Initiative ownership", "Technical direction", "Cross-functional delivery", "Stakeholder communication", "Mentoring", "Engineering practices"],
   },
-  { group: "App architecture", items: ["TypeScript", "Redux", "Zustand", "React Query", "WebSockets / real-time data", "REST APIs"] },
-  { group: "Quality", items: ["Jest", "React Native Testing Library", "Detox", "Performance profiling", "Code review"] },
   {
-    group: "Delivery & ops",
-    items: ["CI/CD", "App Store & Google Play releases", "Feature flags & A/B testing", "Sentry", "Datadog", "Segment"],
+    group: "AI",
+    items: ["AI-first development", "AI coding agents", "AI-assisted code review & testing", "Workflow automation", "Team AI enablement"],
   },
-  { group: "Also", items: ["React", "Next.js", "Node.js", "NestJS", "Docker", "Terraform", "AWS"] },
-  { group: "Leadership", items: ["Technical ownership", "Cross-functional delivery", "Mentoring", "AI-assisted development"] },
+  {
+    group: "Mobile",
+    items: ["React Native (New Architecture)", "TypeScript", "Native iOS", "Performance", "App Store & Google Play releases"],
+  },
+  {
+    group: "Engineering quality",
+    items: ["Automated testing", "Observability", "CI/CD", "Feature flags & experimentation"],
+  },
+  { group: "Breadth", items: ["React", "Node.js", "NestJS", "Real-time data", "Cloud & infrastructure"] },
 ];
 
 export const lookingFor = {
-  roles: "Senior or Lead Mobile Engineer",
+  roles: "Mobile Lead / Tech Lead or Senior Mobile Engineer",
   where: "Cyprus (hybrid) or relocation",
   domains: "Fintech and product-led companies",
 };
