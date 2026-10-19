@@ -1,31 +1,6 @@
-# Portfolio: Abdallah Daknache
+# abdallahdaknache.com
 
-## Project Info
+Personal portfolio. Vite + React + TypeScript + Tailwind, deployed to GitHub Pages on push to `main`.
 
-**Description**: Personal portfolio website for Abdallah Daknache, Senior Software Engineer & Entrepreneur.
-
-## Development
-
-This project uses:
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-### Prerequisites
-
-- Node.js & npm installed
-
-### Getting Started
-
-```sh
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
+- Content lives in `src/content.ts`. Edit there to update experience, work, and skills.
+- `npm run dev` to develop, `npm run build` to type-check and build.

@@ -33,8 +33,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          VITE_ELEVENLABS_AGENT_ID: ${{ secrets.VITE_ELEVENLABS_AGENT_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
