@@ -3,7 +3,7 @@ import { Section } from "./Section";
 
 export function Spotlight() {
   return (
-    <Section id="spotlight" label="02 — Spotlight" title="What I've led">
+    <Section id="spotlight" label="02 — Spotlight" title="What I've built">
       <article className="rounded-3xl border bg-surface p-6 sm:p-10">
         <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">{spotlight.tag}</p>
         <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{spotlight.title}</h3>
@@ -18,11 +18,6 @@ export function Spotlight() {
             );
           })}
         </dl>
-        <div className="mt-8 flex flex-wrap gap-1.5">
-          {spotlight.stack.map((s) => (
-            <span key={s} className="chip">{s}</span>
-          ))}
-        </div>
       </article>
     </Section>
   );

@@ -15,10 +15,10 @@ export function Contact() {
 
   return (
     <section id="contact" className="border-t">
-      <div className="mx-auto max-w-5xl px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-32">
         <p className="section-label">06 — Contact</p>
         <h2 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-5xl">
-          Building or leading a mobile team? Let's talk.
+          Looking for a senior mobile engineer or a future lead? Let's talk.
         </h2>
 
         <dl className="mt-10 grid max-w-3xl gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-3">

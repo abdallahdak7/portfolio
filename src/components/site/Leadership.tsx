@@ -3,7 +3,7 @@ import { Section } from "./Section";
 
 export function Leadership() {
   return (
-    <Section id="leadership" label="01 — Leadership" title="How I lead">
+    <Section id="leadership" label="01 — Approach" title="How I work">
       <p className="max-w-2xl text-[17px] leading-relaxed text-muted">{leadershipIntro}</p>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {principles.map((p, i) => (
@@ -14,7 +14,7 @@ export function Leadership() {
           </article>
         ))}
       </div>
-      <p className="mt-8 max-w-2xl text-sm leading-relaxed text-subtle">{profile.summary}</p>
+      <p className="mt-8 max-w-2xl text-[15px] leading-relaxed text-muted">{profile.summary}</p>
     </Section>
   );
 }

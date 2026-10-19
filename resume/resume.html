@@ -4,99 +4,94 @@
 <meta charset="utf-8" />
 <title>Abdallah Daknache — Resume</title>
 <style>
-  @page { size: A4; margin: 9mm 14mm 8mm; }
+  @page { size: A4; margin: 15mm 17mm 13mm; }
   * { box-sizing: border-box; }
-  body { font-family: Carlito, Calibri, Arial, sans-serif; font-size: 9.7pt; line-height: 1.28; color: #1b1b1f; margin: 0; }
-  h1 { font-size: 21pt; letter-spacing: -0.02em; margin: 0; color: #13233f; }
-  .tagline { margin-top: 3px; font-size: 9.6pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #13233f; }
-  .contact { margin-top: 5px; color: #55555f; font-size: 9pt; }
-  .contact a { color: #55555f; text-decoration: none; }
-  h2 { font-size: 9pt; letter-spacing: 0.1em; text-transform: uppercase; color: #13233f; margin: 11px 0 5px; padding-bottom: 3px; border-bottom: 1px solid #c9cfda; }
+  body { font-family: Carlito, Calibri, Arial, sans-serif; font-size: 10.6pt; line-height: 1.38; color: #1b1b1f; margin: 0; }
+  h1 { font-size: 25pt; line-height: 1.05; letter-spacing: -0.015em; margin: 0; color: #13233f; }
+  .tagline { margin-top: 6px; font-size: 10pt; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #13233f; }
+  .contact { margin-top: 7px; line-height: 1.5; color: #4a4a54; font-size: 9.8pt; }
+  .contact a { color: #4a4a54; text-decoration: none; }
+  h2 { font-size: 9.8pt; letter-spacing: 0.12em; text-transform: uppercase; color: #13233f; margin: 20px 0 9px; padding-bottom: 4px; border-bottom: 1px solid #c9cfda; }
   p { margin: 0; }
-  .job { margin-top: 6px; break-inside: avoid; }
-  .company { font-weight: 700; color: #13233f; font-size: 10pt; }
-  .company span { font-weight: 400; color: #55555f; }
-  .role { display: flex; justify-content: space-between; font-weight: 600; margin-top: 4px; }
-  .role .date { font-weight: 400; color: #55555f; }
-  ul { margin: 3px 0 0; padding-left: 15px; }
-  li { margin: 1px 0; }
+  p, li { text-wrap: pretty; }
+  .summary { color: #26262c; }
+  .job { margin-top: 13px; break-inside: avoid; }
+  h2 + .job { margin-top: 0; }
+  .company { font-weight: 700; color: #13233f; font-size: 11.2pt; }
+  .company span { font-weight: 400; color: #4a4a54; font-size: 10.4pt; }
+  .role { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; margin-top: 4px; }
+  ul + .role { margin-top: 9px; }
+  .role + .role { margin-top: 3px; }
+  .role .date { font-weight: 400; color: #4a4a54; font-variant-numeric: tabular-nums; }
+  ul { margin: 4px 0 0; padding-left: 16px; }
+  li { margin: 2.5px 0; padding-left: 2px; }
   li::marker { color: #6b7a96; }
-  .skills { display: grid; grid-template-columns: 128px 1fr; gap: 3px 10px; }
-  .skills dt { font-weight: 600; color: #13233f; }
-  .skills dd { margin: 0; color: #2c2c33; }
+  .skills { display: grid; grid-template-columns: 112px 1fr; gap: 5px 12px; margin: 0; }
+  .skills dt { font-weight: 700; color: #13233f; }
+  .skills dd { margin: 0; color: #26262c; }
 </style>
 </head>
 <body>
   <h1>Abdallah Daknache</h1>
-  <p class="tagline">Senior Mobile Engineer · Mobile Leadership · AI-First Engineering</p>
+  <p class="tagline">Senior Mobile Engineer · Platform · AI-First Engineering</p>
   <p class="contact">
-    Limassol, Cyprus · Open to relocation ·
+    Limassol, Cyprus · Open to relocation<br />
     <a href="mailto:abdallah.daknache@gmail.com">abdallah.daknache@gmail.com</a> ·
     <a href="https://www.linkedin.com/in/abdallah-daknache/">linkedin.com/in/abdallah-daknache</a> ·
     <a href="https://abdallahdaknache.com">abdallahdaknache.com</a>
   </p>
 
-  <h2>Professional Summary</h2>
-  <p>
+  <h2>Summary</h2>
+  <p class="summary">
     Senior Mobile Engineer with 7+ years across backend, web, and mobile, on the platform team behind Pepperstone's global
-    trading app. I lead core initiatives end to end, including the shared authentication platform used across web and
-    mobile, and help grow a 20–30 engineer organisation through mentoring and technical interviewing. I work AI-first every
-    day (Cursor, Claude) and lead AI adoption in my team, with the guardrails a regulated fintech product requires.
+    trading app. I own core initiatives end to end, built the shared sign-in platform used across web and mobile, and take
+    part in technical interviews as the team grows. I work AI-first and champion AI adoption in my team. Open to leadership roles.
   </p>
 
-  <h2>Professional Experience</h2>
+  <h2>Experience</h2>
 
   <div class="job">
     <div class="company">Pepperstone <span>· Limassol, Cyprus · Multi-award-winning global online broker</span></div>
     <div class="role"><span>Senior Mobile Engineer</span><span class="date">Aug 2024 – Present</span></div>
     <ul>
-      <li>Lead core initiatives on the platform team, which owns the app's shared foundations, end to end from requirements with product through architecture, delivery, and release.</li>
-      <li>Designed and built the shared authentication module used across Pepperstone's web and mobile apps, standardising sign-in on OpenID Connect and OAuth 2.0 (Auth0) with JWKS-based token verification.</li>
-      <li>Align engineering, product, design, and QA on scope, dependencies, and risks; keep stakeholders informed on decisions and progress.</li>
-      <li>Helped scale engineering to 20–30 engineers by running technical interviews and contributing to hiring decisions; mentor engineers through guidance and code reviews.</li>
-      <li>Work AI-first daily with Cursor and Claude and lead AI adoption in the team, building and sharing reusable AI-assisted workflows that make engineers more efficient.</li>
+      <li>Own core initiatives on the platform team, which owns the app's shared foundations, from requirements through release.</li>
+      <li>Built the shared sign-in platform used across Pepperstone's web and mobile apps, giving clients one secure, consistent experience and removing duplicated work across teams.</li>
+      <li>Align product, design, and engineering on scope, risks, and progress.</li>
+      <li>Took part in growing the engineering team to 10 people through technical interviews; share knowledge with mid-level and junior engineers.</li>
+      <li>Champion AI adoption in the team by sharing reusable workflows that make engineers more efficient.</li>
     </ul>
     <div class="role"><span>Mobile Engineer</span><span class="date">Jul 2022 – Jul 2024</span></div>
     <ul>
-      <li>Delivered features for a production React Native and TypeScript trading app with real-time market data, where responsiveness and reliability are business-critical.</li>
-      <li>Made app performance measurable by building a native iOS startup-time module, then profiled and resolved rendering bottlenecks, so performance work could be prioritised on data.</li>
-      <li>Strengthened production readiness through monitoring and analytics (Sentry, Datadog, Segment) and automated CI/CD builds and App Store / Google Play releases.</li>
+      <li>Delivered features for a production React Native trading app where speed and reliability are business-critical.</li>
+      <li>Made app performance measurable, so performance work could be prioritised on data.</li>
+      <li>Strengthened production readiness through monitoring, analytics, and automated releases.</li>
     </ul>
   </div>
 
   <div class="job">
     <div class="company">EverestCM <span>· Limassol, Cyprus (Remote)</span></div>
     <div class="role"><span>Senior Frontend Engineer</span><span class="date">Oct 2021 – Jul 2022</span></div>
-    <ul>
-      <li>Delivered React and TypeScript features, improved maintainability and performance, and contributed to API integration and Docker/Terraform delivery workflows.</li>
-    </ul>
+    <ul><li>Delivered web features and improved the maintainability and performance of the frontend.</li></ul>
   </div>
 
   <div class="job">
     <div class="company">Orea.io <span>· Limassol, Cyprus</span></div>
     <div class="role"><span>Mid-Level Frontend Engineer</span><span class="date">Feb 2021 – Oct 2021</span></div>
-    <ul>
-      <li>Built a React pre-trade application for data-intensive trading workflows, partnering with product and design on usability, reusable components, and architecture.</li>
-    </ul>
+    <ul><li>Built a pre-trade web application with product and design, focused on fast, data-heavy trading workflows.</li></ul>
   </div>
 
   <div class="job">
-    <div class="company">GO.MEDIA KG <span>· Remote (Germany)</span></div>
+    <div class="company">GO.MEDIA KG <span>· Germany (Remote)</span></div>
     <div class="role"><span>Mid-Level Backend Engineer</span><span class="date">Jul 2020 – Aug 2021</span></div>
     <div class="role"><span>Junior Backend Engineer</span><span class="date">May 2019 – Jun 2020</span></div>
-    <ul>
-      <li>Developed backend services and REST APIs with NestJS, Node.js, and TypeScript, including business logic, integrations, and data-processing workflows.</li>
-    </ul>
+    <ul><li>Built backend services and APIs, including business logic and third-party integrations.</li></ul>
   </div>
 
   <h2>Skills</h2>
   <dl class="skills">
-    <dt>Leadership</dt><dd>Initiative ownership · Technical direction · Cross-functional delivery · Stakeholder communication · Mentoring · Technical interviewing &amp; hiring</dd>
-    <dt>AI</dt><dd>Cursor · Claude &amp; Claude Code · AI coding agents · AI-assisted code review &amp; testing · Team AI enablement · Codex, Kimi, Grok</dd>
-    <dt>Platform &amp; security</dt><dd>Authentication architecture · OpenID Connect · OAuth 2.0 · Auth0 · JWT / JWKS · Shared web &amp; mobile modules</dd>
-    <dt>Mobile</dt><dd>React Native (New Architecture, Hermes) · TypeScript · Native iOS · Redux, Zustand, React Query · Real-time data (WebSockets) · Performance</dd>
-    <dt>Quality &amp; delivery</dt><dd>Jest, React Native Testing Library, Detox · Sentry, Datadog, Segment · CI/CD · App Store &amp; Google Play releases · Feature flags &amp; A/B testing</dd>
-    <dt>Breadth</dt><dd>React · Next.js · Node.js · NestJS · Docker · Terraform · AWS</dd>
+    <dt>Ways of working</dt><dd>Initiative ownership · Cross-team delivery · Knowledge sharing · Technical interviewing</dd>
+    <dt>AI</dt><dd>AI-first engineering · Team AI enablement</dd>
+    <dt>Engineering</dt><dd>React Native · TypeScript · iOS · Platform &amp; authentication · Performance</dd>
   </dl>
 </body>
 </html>

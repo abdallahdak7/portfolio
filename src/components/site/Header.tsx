@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { profile } from "@/content";
 
 const links = [
-  { href: "#leadership", label: "Leadership" },
+  { href: "#leadership", label: "Approach" },
   { href: "#spotlight", label: "Spotlight" },
   { href: "#ai", label: "AI" },
   { href: "#experience", label: "Experience" },
