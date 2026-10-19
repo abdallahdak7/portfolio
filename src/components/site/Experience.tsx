@@ -12,6 +12,7 @@ export function Experience() {
               <h3 className="text-lg font-semibold tracking-tight">{job.company}</h3>
               <span className="text-sm text-subtle">{job.location}</span>
             </div>
+            {job.context && <p className="mt-0.5 text-sm text-muted">{job.context}</p>}
 
             <ol className="mt-5 space-y-6 border-l pl-6">
               {job.roles.map((role, i) => (

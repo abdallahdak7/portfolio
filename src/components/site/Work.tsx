@@ -1,22 +1,45 @@
-import { work } from "@/content";
+import { caseStudies } from "@/content";
 import { Section } from "./Section";
+
+const rows = [
+  { key: "problem", label: "Problem" },
+  { key: "role", label: "My role" },
+  { key: "approach", label: "Approach" },
+  { key: "outcome", label: "Outcome" },
+] as const;
 
 export function Work() {
   return (
-    <Section id="work" label="02 — Selected work" title="Highlights">
-      <div className="grid gap-4 sm:grid-cols-2">
-        {work.map((item, i) => (
+    <Section id="work" label="02 — Case studies" title="Selected impact">
+      <div className="space-y-5">
+        {caseStudies.map((c) => (
           <article
-            key={item.title}
-            className={`group flex flex-col rounded-2xl border bg-surface p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[0_8px_30px_-12px_hsl(var(--foreground)/0.15)] ${
-              i === 0 ? "sm:col-span-2" : ""
-            }`}
+            key={c.title}
+            className="rounded-2xl border bg-surface p-6 transition-colors duration-300 hover:border-foreground/20 sm:p-8"
           >
-            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">{item.tag}</p>
-            <h3 className="mt-3 text-lg font-semibold tracking-tight">{item.title}</h3>
-            <p className="mt-2 flex-1 text-[15px] leading-relaxed text-muted">{item.description}</p>
-            <div className="mt-5 flex flex-wrap gap-1.5">
-              {item.stack.map((s) => (
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">{c.tag}</p>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight">{c.title}</h3>
+              </div>
+              {c.metric && (
+                <span className="rounded-full bg-accent-soft px-3 py-1 font-mono text-sm font-medium text-accent">
+                  {c.metric}
+                </span>
+              )}
+            </div>
+            <dl className="mt-6 space-y-4">
+              {rows.map((r) => (
+                <div key={r.key} className="grid gap-1 sm:grid-cols-[110px_1fr] sm:gap-6">
+                  <dt className={`text-sm font-medium ${r.key === "outcome" ? "text-accent" : ""}`}>{r.label}</dt>
+                  <dd className={`text-[15px] leading-relaxed ${r.key === "outcome" ? "text-foreground" : "text-muted"}`}>
+                    {c[r.key]}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-6 flex flex-wrap gap-1.5">
+              {c.stack.map((s) => (
                 <span key={s} className="chip">{s}</span>
               ))}
             </div>

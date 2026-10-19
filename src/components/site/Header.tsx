@@ -3,7 +3,7 @@ import { profile } from "@/content";
 
 const links = [
   { href: "#experience", label: "Experience" },
-  { href: "#work", label: "Work" },
+  { href: "#work", label: "Case studies" },
   { href: "#about", label: "About" },
   { href: "#contact", label: "Contact" },
 ];
