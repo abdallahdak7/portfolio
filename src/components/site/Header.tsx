@@ -3,6 +3,7 @@ import { profile } from "@/content";
 
 const links = [
   { href: "#leadership", label: "Leadership" },
+  { href: "#spotlight", label: "Spotlight" },
   { href: "#ai", label: "AI" },
   { href: "#experience", label: "Experience" },
   { href: "#contact", label: "Contact" },

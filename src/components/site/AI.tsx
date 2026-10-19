@@ -4,7 +4,7 @@ import { Section } from "./Section";
 
 export function AI() {
   return (
-    <Section id="ai" label="02 — AI" title="AI-first engineering">
+    <Section id="ai" label="03 — AI" title="AI-first engineering">
       <div className="rounded-3xl border bg-surface p-6 sm:p-10">
         <div className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
           <Sparkles className="h-3.5 w-3.5" /> Part of my daily routine

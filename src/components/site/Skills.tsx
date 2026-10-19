@@ -3,7 +3,7 @@ import { Section } from "./Section";
 
 export function Skills() {
   return (
-    <Section id="skills" label="04 — Skills" title="What I bring">
+    <Section id="skills" label="05 — Skills" title="What I bring">
       <dl className="divide-y border-y">
         {skills.map((s) => (
           <div key={s.group} className="grid gap-2 py-4 sm:grid-cols-[180px_1fr] sm:gap-6">

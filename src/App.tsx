@@ -1,6 +1,7 @@
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { Leadership } from "@/components/site/Leadership";
+import { Spotlight } from "@/components/site/Spotlight";
 import { AI } from "@/components/site/AI";
 import { Experience } from "@/components/site/Experience";
 import { Skills } from "@/components/site/Skills";
@@ -20,6 +21,7 @@ export default function App() {
       <main>
         <Hero />
         <Leadership />
+        <Spotlight />
         <AI />
         <Experience />
         <Skills />

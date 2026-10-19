@@ -9,15 +9,15 @@ export const profile = {
   github: "https://github.com/abdallahdak7",
   resume: "/Abdallah_Daknache_Resume.pdf",
   headline:
-    "I lead mobile initiatives on a global trading app, from shaping the problem with product, through architecture and delivery, to production. I work AI-first every day, and I help my team turn AI into faster, better delivery.",
+    "I lead core platform initiatives for a global trading app across mobile and web, from shaping the problem with product, through architecture and delivery, to production. I work AI-first every day, and I help my team turn AI into faster, better delivery.",
   summary:
     "7+ years across backend, web, and mobile, growing from junior backend engineer to senior mobile engineer. That breadth is what lets me lead across team boundaries today.",
 };
 
 export const glance = [
   { label: "Experience", value: "7+ years · backend, web, mobile" },
-  { label: "Leadership", value: "Initiative ownership · Mentoring" },
-  { label: "Way of working", value: "AI-first, every day" },
+  { label: "Team", value: "Platform team · 20–30 engineer org" },
+  { label: "Way of working", value: "AI-first · Cursor & Claude" },
   { label: "Domain", value: "Fintech · Trading" },
 ];
 
@@ -35,7 +35,7 @@ export const principles = [
   },
   {
     title: "Grow the engineers around me",
-    body: "Through mentoring, technical guidance, and code reviews that teach rather than gatekeep, I help teammates build judgment, not just ship tickets.",
+    body: "Through mentoring, technical guidance, and code reviews that teach rather than gatekeep, I help teammates build judgment. I also help grow the team itself by running technical interviews and giving hiring input.",
   },
   {
     title: "Improve how the team works",
@@ -43,17 +43,41 @@ export const principles = [
   },
 ];
 
+export const spotlight = {
+  title: "One sign-in platform for web and mobile",
+  tag: "Platform · Security · Ownership",
+  rows: [
+    {
+      label: "Goal",
+      text: "Give clients one secure, consistent way to sign in across Pepperstone's website and mobile apps, and stop product teams from each building and maintaining their own authentication.",
+    },
+    {
+      label: "What I owned",
+      text: "I designed and built the core authentication module the platform team provides to both web and mobile, and own it as a shared foundation other teams build on.",
+    },
+    {
+      label: "Key decisions",
+      text: "Build on proven standards instead of custom security: OpenID Connect and OAuth 2.0 with Auth0, and token verification against published signing keys (JWKS). Package it as one well-defined module so web and mobile consume the same logic rather than reimplementing it.",
+    },
+    {
+      label: "Impact",
+      text: "A single source of truth for authentication across web and mobile: a consistent sign-in experience for clients, a smaller security surface to review in a regulated business, and less duplicated work for product teams.",
+    },
+  ],
+  stack: ["OpenID Connect", "OAuth 2.0", "Auth0", "JWKS", "Web + Mobile"],
+};
+
 export const ai = {
   intro:
     "AI is part of how I work every day, not an experiment. I use it across the whole delivery cycle, and as a lead I focus on turning individual productivity into team capability, safely, in a regulated fintech environment.",
   pillars: [
     {
       title: "Across my daily workflow",
-      body: "From planning and breaking down work, to writing and refactoring code with AI agents, debugging, tests, code review, and documentation. AI handles the repetitive parts so I can spend my time on decisions.",
+      body: "Cursor is my daily driver and Claude my thinking partner, from planning and breaking down work, to writing and refactoring code with AI agents, debugging, tests, code review, and documentation. AI handles the repetitive parts so I can spend my time on decisions.",
     },
     {
       title: "Leading team adoption",
-      body: "I build and share reusable AI-assisted workflows with my team, helping engineers adopt them in their own work and lifting the team's delivery speed rather than just my own.",
+      body: "I build and share reusable AI-assisted workflows with my team, and I keep testing new models and agents (Claude Code, Codex, Kimi, Grok) on side projects so the team adopts what actually works.",
     },
     {
       title: "With judgment and guardrails",
@@ -81,8 +105,10 @@ export const experience: Job[] = [
         title: "Senior Mobile Engineer",
         period: "Aug 2024 — Present",
         points: [
-          "Lead mobile initiatives end to end, from shaping requirements with product through architecture, delivery, and release, balancing business priorities, technical trade-offs, and long-term maintainability.",
+          "Lead core initiatives on the platform team, which owns the app's shared foundations, taking them end to end from requirements with product through architecture, delivery, and release.",
           "Align engineering, product, design, and QA on scope, dependencies, and risks, and keep stakeholders informed on decisions and progress.",
+          "Designed and built the shared authentication module used across Pepperstone's web and mobile apps, standardising sign-in on OpenID Connect and OAuth 2.0 (Auth0) with JWKS-based token verification.",
+          "Helped scale engineering to 20–30 engineers by running technical interviews and contributing to hiring decisions.",
           "Mentor engineers through technical guidance and code reviews that build judgment, not just catch bugs.",
           "Use AI across my daily workflow and lead its adoption in the team, building and sharing reusable AI-assisted workflows that make engineers more efficient.",
         ],
@@ -97,7 +123,7 @@ export const experience: Job[] = [
         ],
       },
     ],
-    stack: ["Mobile leadership", "React Native", "TypeScript", "Native iOS", "AI-assisted development", "CI/CD"],
+    stack: ["Platform", "Authentication", "React Native", "TypeScript", "Native iOS", "AI-assisted development", "CI/CD"],
   },
   {
     company: "EverestCM",
@@ -150,11 +176,11 @@ export const experience: Job[] = [
 export const skills = [
   {
     group: "Leadership",
-    items: ["Initiative ownership", "Technical direction", "Cross-functional delivery", "Stakeholder communication", "Mentoring", "Engineering practices"],
+    items: ["Initiative ownership", "Technical direction", "Cross-functional delivery", "Stakeholder communication", "Mentoring", "Technical interviewing & hiring"],
   },
   {
     group: "AI",
-    items: ["AI-first development", "AI coding agents", "AI-assisted code review & testing", "Workflow automation", "Team AI enablement"],
+    items: ["Cursor", "Claude & Claude Code", "AI coding agents", "AI-assisted code review & testing", "Team AI enablement", "Evaluating new models (Codex, Kimi, Grok)"],
   },
   {
     group: "Mobile",
@@ -164,6 +190,7 @@ export const skills = [
     group: "Engineering quality",
     items: ["Automated testing", "Observability", "CI/CD", "Feature flags & experimentation"],
   },
+  { group: "Platform & security", items: ["Authentication architecture", "OpenID Connect", "OAuth 2.0", "Auth0", "JWT / JWKS", "Shared web & mobile modules"] },
   { group: "Breadth", items: ["React", "Node.js", "NestJS", "Real-time data", "Cloud & infrastructure"] },
 ];
 
