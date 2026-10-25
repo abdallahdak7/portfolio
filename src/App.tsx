@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { initAmbient } from "@/lib/ambient";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { Leadership } from "@/components/site/Leadership";
@@ -9,6 +11,10 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 
 export default function App() {
+  useEffect(() => {
+    initAmbient();
+  }, []);
+
   return (
     <>
       <a
