@@ -118,6 +118,27 @@ describe("sendTurn", () => {
     expect(statuses).toEqual(["sending_message", "message_sent"]);
   });
 
+  it("ignores an unknown tool_status", async () => {
+    const { client } = setup(eventStream([{ event: "tool_status", data: { status: "launching" } }, ...reply("ok")], ID_1));
+    const statuses: ToolStatus[] = [];
+    await client.startConversation().sendTurn("hi", { onToolStatus: (s) => statuses.push(s) });
+    expect(statuses).toEqual([]);
+  });
+
+  it("closes the response stream once Tom's reply is done", async () => {
+    const cancel = vi.fn();
+    const encoder = new TextEncoder();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(encoder.encode('event: done\ndata: {}\n\n'));
+      },
+      cancel,
+    });
+    const { client } = setup(new Response(body, { headers: { "Conversation-Id": ID_1 } }));
+    await client.startConversation().sendTurn("hi");
+    expect(cancel).toHaveBeenCalled();
+  });
+
   it("returns a stream error with the partial reply, and leaves it out of history", async () => {
     const { client, calls } = setup(
       eventStream([{ event: "text_delta", data: { text: "Abdal" } }, { event: "error", data: streamError }], ID_1),
@@ -125,7 +146,12 @@ describe("sendTurn", () => {
     );
     const conversation = client.startConversation();
 
-    expect(await conversation.sendTurn("hi")).toEqual({ kind: "error", partialReply: "Abdal", ...streamError });
+    expect(await conversation.sendTurn("hi")).toEqual({
+      kind: "error",
+      partialReply: "Abdal",
+      message: streamError.message,
+      fallbackEmail: streamError.contactEmail,
+    });
 
     await conversation.sendTurn("again");
     expect(calls[1].body.history).toEqual([]);
@@ -172,7 +198,7 @@ describe("sendTurn", () => {
         kind: "rejected",
         error: "rate_limited",
         message: expect.stringContaining("Too many questions"),
-        contactEmail: "abdallah.daknache@gmail.com",
+        fallbackEmail: "abdallah.daknache@gmail.com",
         retryAfterSeconds: 30,
       });
     });
@@ -183,7 +209,7 @@ describe("sendTurn", () => {
         kind: "rejected",
         error: "turn_limit_reached",
         bookingLink: expect.stringContaining("https://"),
-        contactEmail: "abdallah.daknache@gmail.com",
+        fallbackEmail: "abdallah.daknache@gmail.com",
       });
     });
 

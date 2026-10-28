@@ -163,6 +163,12 @@ export const skills = [
   { group: "Engineering", items: ["React Native", "TypeScript", "iOS", "Platform & authentication", "Performance"] },
 ];
 
+export const askTom = {
+  title: "Questions? Ask Tom",
+  intro:
+    "Tom is an AI assistant that answers questions about my work and experience, using a profile I've approved. He can also pass a message on to me or share a link to book a call.",
+};
+
 export const lookingFor = {
   roles: "Mobile Lead / Tech Lead or Senior Mobile Engineer",
   where: "Cyprus (hybrid) or relocation",

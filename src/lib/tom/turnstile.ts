@@ -57,12 +57,13 @@ export type Turnstile = {
 export function createTurnstile(sitekey: string): Turnstile {
   let container: HTMLElement | null = null;
   let widgetId: string | null = null;
-  let pending: { resolve: (token: string) => void; reject: (e: Error) => void } | null = null;
+  let pending: { resolve: (token: string) => void; reject: (e: Error) => void; timer: number } | null = null;
 
   const settle = (outcome: { token: string } | { error: string }) => {
     const p = pending;
     pending = null;
     if (!p) return;
+    clearTimeout(p.timer);
     if ("token" in outcome) p.resolve(outcome.token);
     else p.reject(new Error(outcome.error));
   };
@@ -85,8 +86,10 @@ export function createTurnstile(sitekey: string): Turnstile {
       settle({ error: "superseded" });
 
       const token = new Promise<string>((resolve, reject) => {
-        pending = { resolve, reject };
-        setTimeout(() => settle({ error: "timed out" }), TOKEN_TIMEOUT_MS);
+        const timer = setTimeout(() => {
+          if (pending?.timer === timer) settle({ error: "timed out" });
+        }, TOKEN_TIMEOUT_MS) as unknown as number;
+        pending = { resolve, reject, timer };
       });
 
       if (!widgetId) {

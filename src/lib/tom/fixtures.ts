@@ -1,7 +1,7 @@
 // Responses shaped like the Worker's (docs/api.md in abdallahdak7/speak-about-abdallah).
 // Shared by the tests and the dev mock.
 
-export const CONTACT_EMAIL = "abdallah.daknache@gmail.com";
+export const FALLBACK_EMAIL = "abdallah.daknache@gmail.com";
 // Placeholder: the real Booking link comes from the Worker's rejection payloads.
 export const BOOKING_LINK = "https://calendly.com/example";
 
@@ -38,29 +38,29 @@ export const rejections = {
       429,
       {
         error: "rate_limited",
-        message: `Too many questions from your network in the last hour. Please wait a while before asking again, or reach Abdallah at ${CONTACT_EMAIL}.`,
-        contactEmail: CONTACT_EMAIL,
+        message: `Too many questions from your network in the last hour. Please wait a while before asking again, or reach Abdallah at ${FALLBACK_EMAIL}.`,
+        contactEmail: FALLBACK_EMAIL,
       },
       { "Retry-After": "30" },
     ),
   turn_limit_reached: () =>
     json(429, {
       error: "turn_limit_reached",
-      message: `This conversation has reached its limit. You can book a call with Abdallah at ${BOOKING_LINK} or email him at ${CONTACT_EMAIL}.`,
+      message: `This conversation has reached its limit. You can book a call with Abdallah at ${BOOKING_LINK} or email him at ${FALLBACK_EMAIL}.`,
       bookingLink: BOOKING_LINK,
-      contactEmail: CONTACT_EMAIL,
+      contactEmail: FALLBACK_EMAIL,
     }),
   verification_failed: () =>
     json(403, {
       error: "verification_failed",
-      message: `We couldn't verify that you're a person. Please reload the page and try again, or email Abdallah at ${CONTACT_EMAIL}.`,
-      contactEmail: CONTACT_EMAIL,
+      message: `We couldn't verify that you're a person. Please reload the page and try again, or email Abdallah at ${FALLBACK_EMAIL}.`,
+      contactEmail: FALLBACK_EMAIL,
     }),
   invalid_request: () => json(400, { error: "invalid_request" }),
   message_too_long: () => json(400, { error: "message_too_long" }),
 };
 
 export const streamError = {
-  message: `Tom can't answer right now. Please email Abdallah at ${CONTACT_EMAIL}.`,
-  contactEmail: CONTACT_EMAIL,
+  message: `Tom can't answer right now. Please email Abdallah at ${FALLBACK_EMAIL}.`,
+  contactEmail: FALLBACK_EMAIL,
 };

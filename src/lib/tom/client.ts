@@ -8,18 +8,19 @@ const MAX_HISTORY = 16;
 const MAX_SUGGESTIONS = 3;
 
 export type Turn = { role: "visitor" | "tom"; text: string };
-export type ToolStatus = "sending_message" | "message_sent" | "message_not_sent";
+const TOOL_STATUSES = ["sending_message", "message_sent", "message_not_sent"] as const;
+export type ToolStatus = (typeof TOOL_STATUSES)[number];
 
 export type Rejection =
-  | { kind: "rejected"; error: "rate_limited"; message: string; contactEmail: string; retryAfterSeconds: number | null }
-  | { kind: "rejected"; error: "turn_limit_reached"; message: string; contactEmail: string; bookingLink: string }
-  | { kind: "rejected"; error: "verification_failed"; message: string; contactEmail: string }
+  | { kind: "rejected"; error: "rate_limited"; message: string; fallbackEmail: string; retryAfterSeconds: number | null }
+  | { kind: "rejected"; error: "turn_limit_reached"; message: string; fallbackEmail: string; bookingLink: string }
+  | { kind: "rejected"; error: "verification_failed"; message: string; fallbackEmail: string }
   | { kind: "rejected"; error: "invalid_request" | "message_too_long" };
 
 export type TurnResult =
   | { kind: "done"; reply: string }
   /** The stream ended with an `error` event. The turn still counts against the Conversation. */
-  | { kind: "error"; message: string; contactEmail: string; partialReply: string }
+  | { kind: "error"; message: string; fallbackEmail: string; partialReply: string }
   /** Network failure, an unexpected response, a stream that stopped early, or no Turnstile token. */
   | { kind: "failed"; partialReply: string }
   | { kind: "invalid"; reason: "blank" | "too_long" }
@@ -114,7 +115,7 @@ export function createTomClient({
           if (event === "text_delta" && typeof payload.text === "string") {
             partialReply += payload.text;
             handlers.onText?.(payload.text);
-          } else if (event === "tool_status") {
+          } else if (event === "tool_status" && TOOL_STATUSES.includes(payload.status)) {
             handlers.onToolStatus?.(payload.status);
           } else if (event === "done") {
             const visitorTurn: Turn = { role: "visitor", text: message };
@@ -122,7 +123,7 @@ export function createTomClient({
             history = [...history, visitorTurn, tomTurn].slice(-MAX_HISTORY);
             return { kind: "done", reply: partialReply };
           } else if (event === "error") {
-            return { kind: "error", message: payload.message, contactEmail: payload.contactEmail, partialReply };
+            return { kind: "error", message: payload.message, fallbackEmail: payload.contactEmail, partialReply };
           }
         }
         return { kind: "failed", partialReply };
@@ -130,6 +131,8 @@ export function createTomClient({
         return { kind: "failed", partialReply };
       } finally {
         clearTimeout(timer);
+        // Also closes the response body when we return before the server closes it.
+        abort.abort();
       }
     }
 
@@ -171,7 +174,7 @@ async function readRejection(res: Response): Promise<TurnResult> {
         kind: "rejected",
         error: "rate_limited",
         message: body.message,
-        contactEmail: body.contactEmail,
+        fallbackEmail: body.contactEmail,
         retryAfterSeconds: Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : null,
       };
     }
@@ -180,11 +183,11 @@ async function readRejection(res: Response): Promise<TurnResult> {
         kind: "rejected",
         error: "turn_limit_reached",
         message: body.message,
-        contactEmail: body.contactEmail,
+        fallbackEmail: body.contactEmail,
         bookingLink: body.bookingLink,
       };
     case "verification_failed":
-      return { kind: "rejected", error: "verification_failed", message: body.message, contactEmail: body.contactEmail };
+      return { kind: "rejected", error: "verification_failed", message: body.message, fallbackEmail: body.contactEmail };
     case "invalid_request":
     case "message_too_long":
       return { kind: "rejected", error: body.error };

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUp, CalendarDays, Loader2, Mail } from "lucide-react";
-import { profile } from "@/content";
-import { MAX_VISITOR_TURN, tom, turnstile, type Conversation, type ToolStatus, type TurnResult } from "@/lib/tom";
+import { askTom, profile } from "@/content";
+import { MAX_VISITOR_TURN, tom, turnstile, type Conversation, type ToolStatus, type Turn, type TurnResult } from "@/lib/tom";
 import { Section } from "./Section";
 
-type ShownTurn = { id: number; role: "visitor" | "tom"; text: string; streaming?: boolean };
+type ShownTurn = Turn & { id: number; streaming?: boolean };
 
-type Notice = { message: string; contactEmail?: string; bookingLink?: string };
+type Notice = { message: string; fallbackEmail?: string; bookingLink?: string };
 
 const toolStatusCopy: Record<ToolStatus, string> = {
   sending_message: "Sending your message to Abdallah…",
@@ -14,13 +14,14 @@ const toolStatusCopy: Record<ToolStatus, string> = {
   message_not_sent: "Your message couldn't be sent.",
 };
 
-const failedNotice = (): Notice => ({
-  message: `Tom couldn't be reached. Check your connection and try again, or email Abdallah at ${profile.email}.`,
-  contactEmail: profile.email,
+/** For failures without a server payload, so the Fallback email comes from the site's own content. */
+const localNotice = (problem: string): Notice => ({
+  message: `${problem}, or email Abdallah at ${profile.email}.`,
+  fallbackEmail: profile.email,
 });
 
 export function AskTom() {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const [turns, setTurns] = useState<ShownTurn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -36,6 +37,8 @@ export function AskTom() {
   const transcriptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stickToBottom = useRef(true);
+  // `busy` only updates on the next render, so this stops a quick double submit from sending twice.
+  const sending = useRef(false);
 
   // Load the Suggested questions once the section is close to the viewport.
   useEffect(() => {
@@ -46,7 +49,7 @@ export function AskTom() {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        tom.getSuggestions().then((q) => !cancelled && setSuggestions(q));
+        tom.getSuggestions().then((q) => !cancelled && setSuggestedQuestions(q));
       },
       { rootMargin: "400px" },
     );
@@ -73,13 +76,14 @@ export function AskTom() {
     if (el) stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
   };
 
-  const blocked = busy || ended || blockedUntil !== null;
+  const sendingPaused = busy || ended || blockedUntil !== null;
   const trimmed = draft.trim();
-  const canSend = !blocked && trimmed.length > 0 && trimmed.length <= MAX_VISITOR_TURN;
+  const canSend = !sendingPaused && trimmed.length > 0 && trimmed.length <= MAX_VISITOR_TURN;
 
   async function send(text: string) {
     const message = text.trim();
-    if (blocked || !message || message.length > MAX_VISITOR_TURN) return;
+    if (sending.current || sendingPaused || !message || message.length > MAX_VISITOR_TURN) return;
+    sending.current = true;
 
     conversation.current ??= tom.startConversation();
     const visitorId = nextId.current++;
@@ -100,11 +104,12 @@ export function AskTom() {
       },
     });
 
+    sending.current = false;
     setBusy(false);
-    finish(result, { message, visitorId, tomId });
+    showResult(result, { message, visitorId, tomId });
   }
 
-  function finish(result: TurnResult, turn: { message: string; visitorId: number; tomId: number }) {
+  function showResult(result: TurnResult, turn: { message: string; visitorId: number; tomId: number }) {
     const stopStreaming = () => setTurns((t) => t.map((x) => (x.id === turn.tomId ? { ...x, streaming: false } : x)));
     // A refused turn never reached Tom: take it back out and return the text to the input.
     const withdraw = () => {
@@ -121,12 +126,12 @@ export function AskTom() {
         return;
       case "error":
         dropEmptyReply(result.partialReply);
-        show({ message: result.message, contactEmail: result.contactEmail });
+        showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
         return;
       case "failed":
         if (result.partialReply) stopStreaming();
         else withdraw();
-        show(failedNotice());
+        showNotice(localNotice("Tom couldn't be reached. Check your connection and try again"));
         return;
       case "invalid":
         withdraw();
@@ -136,26 +141,23 @@ export function AskTom() {
         switch (result.error) {
           case "rate_limited":
             if (result.retryAfterSeconds) setBlockedUntil(Date.now() + result.retryAfterSeconds * 1000);
-            show({ message: result.message, contactEmail: result.contactEmail });
+            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
             return;
           case "turn_limit_reached":
             setEnded(true);
-            show({ message: result.message, contactEmail: result.contactEmail, bookingLink: result.bookingLink });
+            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail, bookingLink: result.bookingLink });
             return;
           case "verification_failed":
             setEnded(true);
-            show({ message: result.message, contactEmail: result.contactEmail });
+            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
             return;
           default:
-            show({
-              message: `Tom couldn't read that question. Try rephrasing it in under ${MAX_VISITOR_TURN} characters, or email Abdallah at ${profile.email}.`,
-              contactEmail: profile.email,
-            });
+            showNotice(localNotice(`Tom couldn't read that question. Try rephrasing it in under ${MAX_VISITOR_TURN} characters`));
         }
     }
   }
 
-  function show(n: Notice) {
+  function showNotice(n: Notice) {
     setNotice(n);
     setAnnouncement(n.message);
   }
@@ -177,7 +179,7 @@ export function AskTom() {
   const remaining = MAX_VISITOR_TURN - draft.length;
 
   return (
-    <Section id="ask-tom" label="06 — Ask Tom" title="Questions? Ask Tom">
+    <Section id="ask-tom" label="06 — Ask Tom" title={askTom.title}>
       <div
         ref={sectionRef}
         onPointerEnter={turnstile.preload}
@@ -185,19 +187,16 @@ export function AskTom() {
         className="overflow-hidden rounded-3xl border bg-surface"
       >
         <div className="p-6 sm:p-8">
-          <p className="max-w-2xl text-[15px] leading-relaxed text-muted">
-            Tom is an AI assistant that answers questions about my work and experience, using a profile I've approved. He
-            can also pass a message on to me or share a link to book a call.
-          </p>
+          <p className="max-w-2xl text-[15px] leading-relaxed text-muted">{askTom.intro}</p>
 
-          {!started && suggestions.length > 0 && (
+          {!started && suggestedQuestions.length > 0 && (
             <ul className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap" aria-label="Suggested questions">
-              {suggestions.map((q) => (
+              {suggestedQuestions.map((q) => (
                 <li key={q}>
                   <button
                     type="button"
                     onClick={() => send(q)}
-                    disabled={blocked}
+                    disabled={sendingPaused}
                     className="w-full rounded-2xl border bg-background px-4 py-2 text-left text-sm transition-colors hover:border-foreground/30 disabled:opacity-50 sm:w-auto sm:rounded-full"
                   >
                     {q}
@@ -251,15 +250,15 @@ export function AskTom() {
                 <p>
                   <Linkified text={notice.message} />
                 </p>
-                {(notice.bookingLink || notice.contactEmail) && (
+                {(notice.bookingLink || notice.fallbackEmail) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {notice.bookingLink && (
                       <PillLink href={notice.bookingLink} external>
                         <CalendarDays aria-hidden className="h-3.5 w-3.5" /> Book a call
                       </PillLink>
                     )}
-                    {notice.contactEmail && (
-                      <PillLink href={`mailto:${notice.contactEmail}`}>
+                    {notice.fallbackEmail && (
+                      <PillLink href={`mailto:${notice.fallbackEmail}`}>
                         <Mail aria-hidden className="h-3.5 w-3.5" /> Email Abdallah
                       </PillLink>
                     )}

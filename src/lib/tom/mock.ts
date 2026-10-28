@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
+import { FALLBACK_EMAIL, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
 
 // Dev-only stand-in for the Worker, which only accepts requests from https://abdallahdaknache.com.
 // Put one of these words in a question to try a path:
@@ -84,7 +84,7 @@ export const mockFetch: typeof fetch = async (input, init) => {
         ...words(
           sent
             ? "Done. I've passed your message on to Abdallah, and he'll reply to the email you gave."
-            : `Sorry, I couldn't send that. You can email Abdallah directly at ${CONTACT_EMAIL}.`,
+            : `Sorry, I couldn't send that. You can email Abdallah directly at ${FALLBACK_EMAIL}.`,
         ),
         done,
       ],
@@ -98,7 +98,7 @@ export const mockFetch: typeof fetch = async (input, init) => {
       ...words(
         "Abdallah is a Senior Mobile Engineer at Pepperstone, on the platform team behind its trading app. " +
           "He owns core initiatives across mobile and web, such as the shared sign-in module.\n\n" +
-          `(Mock reply ${turns + 1} of ${TURN_LIMIT}. You can reach him at ${CONTACT_EMAIL}.)`,
+          `(Mock reply ${turns + 1} of ${TURN_LIMIT}. You can reach him at ${FALLBACK_EMAIL}.)`,
       ),
       done,
     ],
