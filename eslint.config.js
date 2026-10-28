@@ -23,7 +23,7 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
-  // Mechanical rules from CODING_STANDARDS.md. Config files need default exports, so these cover src only.
+  // Mechanical rules, kept here rather than in CODING_STANDARDS.md. Config files need default exports, so these cover src only.
   {
     files: ["src/**/*.{ts,tsx}"],
     rules: {

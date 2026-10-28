@@ -30,6 +30,7 @@ export const askTom = createAskTom({
   tom,
   humanCheck: turnstile,
   fallbackEmail: about.email,
+  bookingLink: about.bookingLink,
   analytics,
   speechRecognition: browserSpeechRecognition(),
 });

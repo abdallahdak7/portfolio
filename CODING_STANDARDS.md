@@ -1,51 +1,48 @@
 # Coding standards
 
-Judgement calls a reviewer checks. Mechanical rules (no default exports, no `enum`, `import type`, no non-null `!`) are enforced by `npm run lint`, not listed here.
+Judgement calls a reviewer checks. `npm run lint` enforces the mechanical rules.
 
 ## Language
 
-- Name things with the terms in `GLOSSARY.md`, in code, tests, comments and Visitor-facing copy. Use a Visitor turn, the Fallback email or a Notice, not "user message", "contact email" or "error banner".
-- The Worker's wire names (such as `contactEmail`) stay inside `src/lib/tom/client.ts`. Map them to glossary names there; nothing past the client sees a wire shape.
+- Use the terms in `GLOSSARY.md` everywhere: code, test names, comments and Visitor-facing copy ("withdraws a refused Visitor turn").
+- The Worker's wire names (such as `contactEmail`) stay inside `src/lib/tom/client.ts`, which maps them to glossary names.
 
 ## Content
 
-- Facts about Abdallah live in `src/content.ts`. Components render them; they don't restate them. Copy that only describes an interaction (a loading label, a Human check prompt) may live with its component.
-- Every Confirmed fact must be backed by the Résumé or LinkedIn. No numbers, titles or outcomes that aren't there.
-- Never present an Aspiration as a Confirmed fact or a commitment ("Open to Lead roles", not "Lead engineer").
-- A change to Experience means the same change to `resume/resume.html`, so the site and the Résumé state the same facts.
+- Facts about Abdallah live in `src/content.ts`. Components render them; static pages fill them in with `%about.<fact>%`. Copy that only describes an interaction may live with its component.
+- Back every Confirmed fact with the Résumé or LinkedIn, and phrase an Aspiration as one ("Open to Lead roles").
+- Change Experience in `resume/resume.html` too, so the site and the Résumé agree.
 
 ## Modules and seams
 
-- Prefer deep modules: a lot of behaviour behind a small interface. Keep logic that isn't rendering out of components, in `src/lib`, behind an interface that tests can drive.
-- Accept dependencies, don't create them: anything that does I/O or depends on the browser (`fetch`, Turnstile, timers worth testing) is passed in, as `createTomClient` and `createTurnstile` do.
-- Wire up the real and dev adapters in one place (`src/lib/tom/index.ts`), not at each call site.
-- Don't add a seam with only one adapter. A second adapter, whether a test fake or a dev mock, is what earns it.
+- Logic lives in `src/lib` as deep modules; components only render.
+- Pass in anything that does I/O or touches the browser (`fetch`, Turnstile, Umami, timers), as `createTomClient` does.
+- Wire the real and dev adapters in `src/lib/tom/index.ts` only.
+- A seam earns its place with a second adapter: a test fake or a dev mock.
 
 ## Tom client
 
-- Outcomes the Visitor can see are returned as values in a discriminated union (`TurnResult`), never thrown. Throw only for programmer errors.
-- Treat every Worker response as untrusted: narrow it at the edge of the client before using it. A response shaped in any way we don't expect is a `failed` turn, not a crash.
-- Keep `src/lib/tom/fixtures.ts` in line with `docs/api.md` in `abdallahdak7/speak-about-abdallah`. The tests and the dev mock both use it, so it is the client's picture of the contract.
+- Outcomes the Visitor can see are values in `TurnResult`; throw only for programmer errors.
+- Narrow every Worker response at the client's edge. An unexpected shape is a `failed` turn.
+- `src/lib/tom/fixtures.ts` mirrors the Worker (`docs/api.md` and `src/contact.json` in `abdallahdak7/speak-about-abdallah`).
 
 ## React
 
-- Components are named after the Section or element they render, one exported component per file in `src/components/site`.
-- Each piece of state has one owner. Don't mirror a client's state into React state when you can read it from the client.
-- Every state change the Visitor should know about in Ask Tom (Tom replying, a Notice, the Human check) is also announced through the live region.
+- One exported component per file in `src/components/site`, named after the Section or element it renders.
+- Read state from its owner, such as a client, rather than copying it into React state.
+- Announce every change the Visitor should know about in Ask Tom through the live region.
 
 ## Styling and accessibility
 
-- Use the theme tokens (`background`, `surface`, `foreground`, `muted`, `subtle`, `border`, `accent`) instead of raw colours, so light and dark mode both work.
-- Motion and pointer effects respect `prefers-reduced-motion` and `pointer: fine`.
-- Icon-only controls carry an accessible name, and decorative icons are `aria-hidden`.
+- Colour with the theme tokens in `src/theme.css`, so light and dark mode both work.
+- Gate motion and pointer effects on `prefers-reduced-motion` and `pointer: fine`.
+- Give icon-only controls an accessible name, and mark decorative icons `aria-hidden`.
 
 ## Dependencies
 
-- Add a runtime dependency only when the platform can't reasonably do the job. Today there are two: React and the icon set (see ADR-0002).
+- The runtime dependencies are React and the icon set (ADR-0002); the platform does the rest.
 
 ## Tests
 
-- Test only at agreed seams, through the module's interface. If a test has to change when the implementation changes but the behaviour doesn't, it is testing past the interface.
-- Fake only at the system edge (`fetch`, `window.turnstile`, speech recognition, time). Don't mock our own modules: drive the real `createTomClient` with a fake `fetch`.
-- Expected values come from an independent source, such as a literal, a fixture or the API contract, never from recomputing the code's logic.
-- Test names state behaviour in glossary terms ("withdraws a refused Visitor turn"), not mechanics ("calls setTurns").
+- Test through a module's interface, faking only the system edge (`fetch`, `window.turnstile`, `window.umami`, speech recognition, time) and driving our own modules for real.
+- Take expected values from a literal, a fixture or the API contract.

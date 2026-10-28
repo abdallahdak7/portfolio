@@ -28,7 +28,7 @@ localStorage.setItem("umami.disabled", "1");
 
 Remove it with `localStorage.removeItem("umami.disabled")`.
 
-The Privacy notice is a static page at `public/privacy/index.html`. Update it whenever what the site or Tom's Worker collects changes.
+The Privacy notice is a static page at `privacy/index.html`, with no JavaScript. Vite fills its `%about.<fact>%` placeholders from `src/content.ts` at build time, and it shares the theme tokens in `src/theme.css`. Update it whenever what the site or Tom's Worker collects changes.
 
 ## Resume
 

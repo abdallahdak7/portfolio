@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { contactVia, createAnalytics } from "./analytics";
+import { createAnalytics } from "./analytics";
 
 describe("createAnalytics", () => {
   it("sends each Goal event with its fixed properties", () => {
@@ -37,18 +37,5 @@ describe("createAnalytics", () => {
     }));
 
     expect(() => analytics.contact("email", "hero")).not.toThrow();
-  });
-});
-
-describe("contactVia", () => {
-  it("names the Contact a link makes", () => {
-    expect(contactVia("mailto:abdallah.daknache@gmail.com")).toBe("email");
-    expect(contactVia("https://calendly.com/abdallah-daknache")).toBe("booking");
-    expect(contactVia("https://calendly.com/abdallah-daknache/30min")).toBe("booking");
-    expect(contactVia("https://www.linkedin.com/in/abdallah-daknache/")).toBe("linkedin");
-  });
-
-  it("makes no Contact for other links", () => {
-    expect(contactVia("https://github.com/abdallahdak7")).toBeNull();
   });
 });

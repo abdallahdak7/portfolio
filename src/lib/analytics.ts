@@ -1,5 +1,3 @@
-import { about } from "@/content";
-
 // Audience figures, sent to Umami (docs/adr/0004). Every event here serves a Goal, and its properties are
 // fixed values, so nothing a Visitor typed can be sent.
 // https://umami.is/docs/tracker-functions
@@ -12,11 +10,11 @@ declare global {
   }
 }
 
-/** Where a Résumé download was clicked. */
+/** Where a Résumé download was clicked: the header, the Hero or the Contact section. */
 export type ResumeFrom = "header" | "hero" | "contact";
 /** How a Visitor reached out. */
 export type ContactVia = "booking" | "email" | "linkedin" | "tom-message";
-/** Where on the site a Contact happened. */
+/** Where on the site a Contact happened: the Hero, the Contact section (`contact`) or Ask Tom. */
 export type ContactFrom = "hero" | "contact" | "tom";
 
 export type Analytics = {
@@ -45,12 +43,4 @@ export function createAnalytics(getUmami: () => UmamiApi | undefined): Analytics
     contact: (via, from) => track("contact", { via, from }),
     conversationStarted: () => track("conversation-started"),
   };
-}
-
-/** The Contact a link makes, for links whose target isn't known in advance, such as those in a Tom turn. */
-export function contactVia(href: string): ContactVia | null {
-  if (href.startsWith("mailto:")) return "email";
-  if (href.startsWith(about.bookingLink)) return "booking";
-  if (href.startsWith(about.linkedin)) return "linkedin";
-  return null;
 }

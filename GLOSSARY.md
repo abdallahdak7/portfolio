@@ -99,11 +99,11 @@ _Avoid_: contact email
 ## Measuring the site
 
 **Audience figures**:
-Counts about Visitors as a group: how many came, from which Source, country and device, and how many made a Résumé download or started a Conversation. Never about one identifiable Visitor.
+Counts about Visitors as a group: how many came, from which Source, country and device, and how many made a Résumé download, started a Conversation or made a Contact. Never about one identifiable Visitor.
 _Avoid_: tracking, "who visited"
 
 **Source**:
-Where a Visitor came from: the referring site, or the campaign tag on a link Abdallah posted.
+Where a Visitor came from: the referring site, such as LinkedIn, GitHub or a search engine.
 _Avoid_: channel, referral
 
 **Résumé download**:

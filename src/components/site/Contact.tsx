@@ -1,6 +1,7 @@
-import { ArrowUpRight, CalendarDays } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { lookingFor, about } from "@/content";
 import { analytics } from "@/lib/tom";
+import { BookingLink } from "./BookingLink";
 
 export function Contact() {
   const links = [
@@ -31,15 +32,10 @@ export function Contact() {
           ))}
         </dl>
 
-        <a
-          href={about.bookingLink}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => analytics.contact("booking", "contact")}
+        <BookingLink
+          from="contact"
           className="mt-10 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-85"
-        >
-          <CalendarDays aria-hidden className="h-4 w-4" /> Book a call
-        </a>
+        />
         <p className="mt-6 text-sm text-subtle">Or email</p>
         <a
           href={`mailto:${about.email}`}

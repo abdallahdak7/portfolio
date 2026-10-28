@@ -1,7 +1,8 @@
-import { ArrowUpRight, CalendarDays, Download, Mail, MapPin } from "lucide-react";
+import { ArrowUpRight, Download, Mail, MapPin } from "lucide-react";
 import { glance, about } from "@/content";
 import { keepTogether } from "@/lib/text";
 import { analytics } from "@/lib/tom";
+import { BookingLink } from "./BookingLink";
 
 export function Hero() {
   return (
@@ -23,15 +24,10 @@ export function Hero() {
       </p>
 
       <div className="reveal reveal-delay-3 mt-10 grid grid-cols-3 items-center gap-3 sm:flex sm:flex-wrap">
-        <a
-          href={about.bookingLink}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => analytics.contact("booking", "hero")}
+        <BookingLink
+          from="hero"
           className="col-span-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
-        >
-          <CalendarDays aria-hidden className="h-3.5 w-3.5" /> Book a call
-        </a>
+        />
         <a
           href={`mailto:${about.email}`}
           onClick={() => analytics.contact("email", "hero")}

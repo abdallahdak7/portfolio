@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { about } from "@/content";
 import type { SpeechRecognition } from "@/lib/speech";
 import { createAnalytics } from "@/lib/analytics";
 import { createAskTom } from "./askTom";
@@ -64,6 +65,7 @@ function setupWithSpeech(...responses: (Response | Error)[]) {
   const askTom = createAskTom({
     tom,
     fallbackEmail: EMAIL,
+    bookingLink: about.bookingLink,
     analytics: createAnalytics(() => undefined),
     humanCheck: { onInteractive: () => () => {} },
     speechRecognition: speech.SpeechRecognition,
@@ -82,6 +84,7 @@ function setupWithToken(getTurnstileToken: () => Promise<string>, ...responses: 
   const askTom = createAskTom({
     tom,
     fallbackEmail: EMAIL,
+    bookingLink: about.bookingLink,
     analytics: createAnalytics(() => umami),
     humanCheck: {
       onInteractive: (listener) => {
@@ -363,14 +366,45 @@ describe("Audience figures", () => {
     expect(tracked()).not.toContainEqual(expect.arrayContaining(["contact"]));
   });
 
+  it("counts a Booking link or email link followed in Ask Tom as a Contact from Tom", () => {
+    const { askTom, tracked } = setup();
+
+    askTom.followLink(BOOKING_LINK);
+    askTom.followLink(`mailto:${EMAIL}`);
+
+    expect(tracked()).toEqual([
+      ["contact", { via: "booking", from: "tom" }],
+      ["contact", { via: "email", from: "tom" }],
+    ]);
+  });
+
+  it("counts the Booking link Tom offers in a Notice as a Contact from Tom", async () => {
+    const { askTom, tracked } = setup(rejections.turn_limit_reached());
+
+    await askTom.send("hi");
+    askTom.followLink(askTom.getState().notice?.bookingLink ?? "");
+
+    expect(tracked()).toEqual([["contact", { via: "booking", from: "tom" }]]);
+  });
+
+  it("doesn't count other links followed in Ask Tom", () => {
+    const { askTom, tracked } = setup();
+
+    askTom.followLink("https://github.com/abdallahdak7");
+
+    expect(tracked()).toEqual([]);
+  });
+
   it("never sends what the Visitor wrote", async () => {
+    const visitorTurn = "Tell him Jane from Acme wants to talk";
     const { askTom, tracked } = setup(
       eventStream([{ event: "tool_status", data: { status: "message_sent" } }, ...reply("Done.")], ID),
     );
 
-    await askTom.send("Tell him Jane from Acme wants to talk");
+    await askTom.send(visitorTurn);
 
-    expect(JSON.stringify(tracked())).not.toContain("Jane");
+    expect(tracked()).not.toEqual([]);
+    for (const call of tracked()) expect(JSON.stringify(call)).not.toContain(visitorTurn);
   });
 });
 

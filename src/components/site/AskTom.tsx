@@ -1,8 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUp, CalendarDays, Loader2, Mail, Mic, Square } from "lucide-react";
 import { askTom as content } from "@/content";
-import { contactVia } from "@/lib/analytics";
-import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, analytics, askTom, turnstile } from "@/lib/tom";
+import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
 import { linkify } from "@/lib/text";
 import { Section } from "./Section";
 
@@ -242,17 +241,11 @@ export function AskTom() {
   );
 }
 
-/** Links in Ask Tom are where Tom earns a Contact. */
-const countContact = (href: string) => {
-  const via = contactVia(href);
-  if (via) analytics.contact(via, "tom");
-};
-
 function PillLink({ href, external, children }: { href: string; external?: boolean; children: ReactNode }) {
   return (
     <a
       href={href}
-      onClick={() => countContact(href)}
+      onClick={() => askTom.followLink(href)}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
       className="inline-flex items-center gap-1.5 rounded-full border bg-surface px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-foreground/30"
     >
@@ -267,7 +260,7 @@ function Linkified({ text }: { text: string }) {
     <>
       {linkify(text).map(({ text: part, href }, i) =>
         href ? (
-          <a key={i} href={href} onClick={() => countContact(href)} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
+          <a key={i} href={href} onClick={() => askTom.followLink(href)} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
             {part}
           </a>
         ) : (
