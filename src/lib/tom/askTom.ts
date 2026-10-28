@@ -1,4 +1,5 @@
 import { MAX_VISITOR_TURN, type TomClient, type ToolStatus, type Turn } from "./client";
+import type { SpeechRecognition, SpeechRecognitionConstructor, SpeechRecognitionResults } from "@/lib/speech";
 import type { Turnstile } from "./turnstile";
 
 // The state behind the Ask Tom section: the transcript, the draft, and whether the Visitor can send.
@@ -6,6 +7,9 @@ import type { Turnstile } from "./turnstile";
 export const HUMAN_CHECK_PROMPT = "Tick the box below so Tom can answer.";
 
 export type ShownTurn = Turn & { id: number; streaming: boolean };
+
+/** `unsupported` where the browser has no speech recognition, so there's nothing to offer. */
+export type DictationStatus = "unsupported" | "off" | "listening";
 
 /** Shown when Tom can't answer. */
 export type Notice = { message: string; fallbackEmail?: string; bookingLink?: string };
@@ -28,6 +32,9 @@ export type AskTomState = {
   paused: boolean;
   /** The Conversation reached its turn limit or the Visitor couldn't be verified; nothing more can be sent. */
   ended: boolean;
+  dictation: DictationStatus;
+  /** Why the last Dictation heard nothing. Cleared when the next one starts. */
+  dictationProblem: string | null;
   /** Tom will take a Visitor turn now: not busy, Paused or Ended. */
   accepting: boolean;
   /** Tom is accepting and the draft can be sent. */
@@ -42,8 +49,13 @@ export type AskTom = {
   subscribe(listener: () => void): () => void;
   /** Fetches the Suggested questions. Only the first call fetches; later calls return the same promise. */
   loadSuggestions(): Promise<void>;
+  /** Typing over a Dictation stops it, so it can't overwrite what was typed. */
   setDraft(text: string): void;
-  /** Sends one Visitor turn. Resolves once Tom's reply has finished or the turn was withdrawn. */
+  /** Listens for one spoken question and writes it after the draft as it's heard. Never sends. */
+  startDictation(): void;
+  /** Stops listening. What was already heard stays in the draft. */
+  stopDictation(): void;
+  /** Sends one Visitor turn. Stops any Dictation first, so nothing heard late lands in the next draft. Resolves once Tom's reply has finished or the turn was withdrawn. */
   send(text: string): Promise<void>;
 };
 
@@ -51,9 +63,20 @@ export type AskTomOptions = {
   tom: TomClient;
   humanCheck: Pick<Turnstile, "onInteractive">;
   fallbackEmail: string;
+  /** The browser's speech recognition. Without it, Dictation is `unsupported`. */
+  speechRecognition?: SpeechRecognitionConstructor;
 };
 
-export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions): AskTom {
+const DICTATION_PROBLEMS: Record<string, string> = {
+  "no-speech": "Didn't catch that. Try again, or type your question.",
+  "not-allowed": "Microphone access is blocked. Allow it in your browser to speak your question, or type it.",
+  "service-not-allowed": "Microphone access is blocked. Allow it in your browser to speak your question, or type it.",
+  "audio-capture": "No microphone found. Type your question instead.",
+  network: "Speech recognition needs a connection. Type your question instead.",
+};
+const DICTATION_FAILED = "Speech recognition stopped. Type your question instead.";
+
+export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition }: AskTomOptions): AskTom {
   let state: AskTomState = {
     suggestedQuestions: [],
     turns: [],
@@ -65,6 +88,8 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
     announcement: "",
     paused: false,
     ended: false,
+    dictation: speechRecognition ? "off" : "unsupported",
+    dictationProblem: null,
     accepting: true,
     canSend: false,
   };
@@ -72,6 +97,7 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
   const conversation = tom.startConversation();
   let nextId = 0;
   let suggestions: Promise<void> | null = null;
+  let recognition: SpeechRecognition | null = null;
 
   const update = (change: Partial<Omit<AskTomState, Derived>>) => {
     const next = { ...state, ...change };
@@ -97,6 +123,15 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
   const updateTurn = (id: number, change: (turn: ShownTurn) => Partial<ShownTurn>) =>
     update({ turns: state.turns.map((t) => (t.id === id ? { ...t, ...change(t) } : t)) });
 
+  /** Drops the current Dictation without a word: whatever it hears from now on is ignored. */
+  const abandonDictation = () => {
+    if (!recognition) return;
+    const abandoned = recognition;
+    recognition = null;
+    abandoned.abort();
+    update({ dictation: "off" });
+  };
+
   humanCheck.onInteractive((needed) =>
     update(needed ? { humanCheckNeeded: true, announcement: HUMAN_CHECK_PROMPT } : { humanCheckNeeded: false }),
   );
@@ -115,12 +150,50 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
     },
 
     setDraft(text) {
+      abandonDictation();
       update({ draft: text });
+    },
+
+    startDictation() {
+      if (!speechRecognition || recognition || state.ended) return;
+      const listening = new speechRecognition();
+      const before = state.draft.trimEnd();
+      listening.continuous = false;
+      listening.interimResults = true;
+      listening.onresult = ({ results }) => {
+        if (recognition !== listening) return;
+        const heard = transcript(results);
+        update({ draft: (before && heard ? `${before} ${heard}` : before + heard).slice(0, MAX_VISITOR_TURN) });
+      };
+      listening.onerror = ({ error }) => {
+        if (recognition !== listening || error === "aborted") return;
+        const problem = DICTATION_PROBLEMS[error] ?? DICTATION_FAILED;
+        update({ dictationProblem: problem, announcement: problem });
+      };
+      listening.onend = () => {
+        if (recognition !== listening) return;
+        recognition = null;
+        update({ dictation: "off", ...(state.dictationProblem ? {} : { announcement: "Stopped listening." }) });
+      };
+
+      recognition = listening;
+      update({ dictation: "listening", dictationProblem: null, announcement: "Listening…" });
+      try {
+        listening.start();
+      } catch {
+        recognition = null;
+        update({ dictation: "off", dictationProblem: DICTATION_FAILED, announcement: DICTATION_FAILED });
+      }
+    },
+
+    stopDictation() {
+      recognition?.stop();
     },
 
     async send(text) {
       const message = text.trim();
       if (!state.accepting || !sendable(message)) return;
+      abandonDictation();
       const visitorId = nextId++;
       const tomId = nextId++;
       update({
@@ -197,6 +270,12 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
       }
     },
   };
+}
+
+function transcript(results: SpeechRecognitionResults) {
+  return Array.from(results, (result) => result[0]?.transcript ?? "")
+    .join("")
+    .trim();
 }
 
 function sendable(text: string) {

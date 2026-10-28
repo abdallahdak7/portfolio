@@ -73,6 +73,10 @@ A Conversation is Ended once it reaches its turn limit or the Visitor can't be v
 **Suggested question**:
 One of up to three professional prompts offered to a Visitor to start a Conversation.
 
+**Dictation**:
+Speaking a question instead of typing it. What the Visitor says is written into their draft as it's heard; they check it and send it themselves. Exists only on this site, not in Tom's backend.
+_Avoid_: voice input, speech-to-text, voice mode
+
 **Message**:
 A note a Visitor asks Tom to pass on to Abdallah: the Visitor's name, email address and text.
 _Avoid_: contact request, lead

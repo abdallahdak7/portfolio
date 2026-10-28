@@ -1,5 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { ArrowUp, CalendarDays, Loader2, Mail } from "lucide-react";
+import { ArrowUp, CalendarDays, Loader2, Mail, Mic, Square } from "lucide-react";
 import { askTom as content } from "@/content";
 import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
 import { linkify } from "@/lib/text";
@@ -17,6 +17,8 @@ export function AskTom() {
     announcement,
     paused,
     ended,
+    dictation,
+    dictationProblem,
     accepting,
     canSend,
   } = useSyncExternalStore(askTom.subscribe, askTom.getState);
@@ -70,6 +72,7 @@ export function AskTom() {
     }
   };
 
+  const listening = dictation === "listening";
   const started = turns.length > 0;
   const remaining = MAX_VISITOR_TURN - draft.length;
 
@@ -189,6 +192,21 @@ export function AskTom() {
               aria-describedby="ask-tom-hint"
               className="max-h-40 min-h-11 flex-1 resize-none rounded-2xl border bg-background px-4 py-2.5 text-base leading-relaxed outline-none [field-sizing:content] placeholder:text-subtle focus:border-foreground/30 disabled:opacity-60 sm:text-[15px]"
             />
+            {dictation !== "unsupported" && (
+              <button
+                type="button"
+                onClick={() => (listening ? askTom.stopDictation() : askTom.startDictation())}
+                disabled={ended}
+                aria-label={listening ? "Stop speaking your question" : "Speak your question"}
+                aria-pressed={listening}
+                title="Your browser may send the audio to its speech service to turn it into text."
+                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-30 ${
+                  listening ? "border-accent/40 bg-accent-soft text-accent" : "bg-background hover:border-foreground/30"
+                }`}
+              >
+                {listening ? <Square aria-hidden className="h-3.5 w-3.5 fill-current" /> : <Mic aria-hidden className="h-4 w-4" />}
+              </button>
+            )}
             <button
               type="submit"
               disabled={!canSend}
@@ -200,7 +218,11 @@ export function AskTom() {
           </div>
           <p id="ask-tom-hint" className="mt-2 flex justify-between gap-4 px-1 font-mono text-[11px] text-subtle">
             <span>
-              {paused ? "Questions are paused for now. Try again later." : "Up to 8 questions per chat. Press Enter to send."}
+              {paused
+                ? "Questions are paused for now. Try again later."
+                : listening
+                  ? "Listening… It stops when you pause. Check the text, then send."
+                  : (dictationProblem ?? "Up to 8 questions per chat. Press Enter to send.")}
             </span>
             {remaining <= 80 && <span aria-live="polite">{remaining} characters left</span>}
           </p>
