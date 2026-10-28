@@ -3,22 +3,22 @@ export const about = {
   role: "Senior Mobile Engineer",
   company: "Pepperstone",
   location: "Limassol, Cyprus",
-  availability: "Open to Lead & Senior Mobile roles",
+  availability: "Open to Lead and Senior Mobile roles",
   email: "abdallah.daknache@gmail.com",
   linkedin: "https://www.linkedin.com/in/abdallah-daknache/",
   github: "https://github.com/abdallahdak7",
   resume: "/Abdallah_Daknache_Resume.pdf",
   headline:
-    "On the platform team behind a global trading app, I own core initiatives across mobile and web, from shaping the problem with product to shipping it to production. I work AI-first every day.",
+    "On the platform team behind a global trading app, I own core initiatives across mobile and web, from requirements to release. Most recently, I built the shared sign-in used across Pepperstone's web and mobile apps.",
   summary:
     "7+ years across backend, web, and mobile. That breadth is what lets me work across team boundaries, and it's why I'm ready to take on more leadership next.",
 };
 
 export const glance = [
-  { label: "Experience", value: "7+ years · backend, web, mobile" },
-  { label: "Team", value: "Platform team · 10-engineer org" },
+  { label: "Experience", value: "7+ years in web, mobile, backend" },
+  { label: "Ownership", value: "Core initiatives, end to end" },
   { label: "Way of working", value: "AI-first, every day" },
-  { label: "Domain", value: "Fintech · Trading" },
+  { label: "Domain", value: "Fintech, trading" },
 ];
 
 export const approachIntro =
@@ -106,10 +106,10 @@ export const experience: Job[] = [
         title: "Senior Mobile Engineer",
         period: "Aug 2024 — Present",
         points: [
-          "Own core initiatives on the platform team, from requirements through release.",
+          "Own core initiatives end to end on the platform team, which looks after the app's shared foundations.",
           "Built the shared sign-in platform used across Pepperstone's web and mobile apps, giving clients one secure, consistent experience and removing duplicated work across teams.",
           "Align product, design, and engineering on scope, risks, and progress.",
-          "Took part in growing the engineering team to 10 people through technical interviews, and share knowledge with mid-level and junior engineers.",
+          "Interview engineering candidates as the team grows, and share knowledge with mid-level and junior engineers.",
           "Champion AI adoption in the team by sharing reusable workflows that make engineers more efficient.",
         ],
       },
@@ -117,9 +117,9 @@ export const experience: Job[] = [
         title: "Mobile Engineer",
         period: "Jul 2022 — Jul 2024",
         points: [
-          "Delivered features for a production trading app where speed and reliability are business-critical.",
+          "Delivered features for a production React Native trading app where speed and reliability are business-critical.",
           "Made app performance measurable, so performance work could be prioritised on data.",
-          "Made releases more reliable and issues in production quicker to spot.",
+          "Made releases more reliable and production issues quicker to spot, through automated releases, monitoring and analytics.",
         ],
       },
     ],
@@ -131,7 +131,7 @@ export const experience: Job[] = [
       {
         title: "Senior Frontend Engineer",
         period: "Oct 2021 — Jul 2022",
-        points: ["Delivered web features and made the site faster and easier to maintain."],
+        points: ["Delivered web features and made the frontend faster and easier to maintain."],
       },
     ],
   },
@@ -142,7 +142,7 @@ export const experience: Job[] = [
       {
         title: "Mid-Level Frontend Engineer",
         period: "Feb 2021 — Oct 2021",
-        points: ["Built a web app for traders with product and design, focused on speed and handling large amounts of data."],
+        points: ["Built a pre-trade web app for traders with product and design, focused on fast, data-heavy workflows."],
       },
     ],
   },
@@ -154,7 +154,7 @@ export const experience: Job[] = [
       {
         title: "Junior Backend Engineer",
         period: "May 2019 — Jun 2020",
-        points: ["Built the backend services behind the product, including integrations with third-party providers."],
+        points: ["Built backend services and APIs, including third-party integrations."],
       },
     ],
   },
@@ -169,8 +169,8 @@ export const askTom = {
 };
 
 export const lookingFor = {
-  title: "Hiring for a mobile lead or senior mobile engineer? Let's talk.",
-  roles: "Mobile Lead / Tech Lead or Senior Mobile Engineer",
-  where: "Cyprus (hybrid) or relocation",
+  title: "Hiring a Mobile Lead, Tech Lead or Senior Mobile Engineer? Let's talk.",
+  roles: "Mobile Lead, Tech Lead or Senior Mobile Engineer",
+  where: "Cyprus (hybrid), open to relocation",
   domains: "Fintech and product-led companies",
 };
