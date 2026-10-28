@@ -43,6 +43,8 @@ export const principles = [
   },
 ];
 
+export type SpotlightRow = { label: string; text: string; highlight?: boolean };
+
 export const spotlight = {
   title: "Tom, the AI assistant on this page",
   tag: "AI · Personal project",
@@ -50,18 +52,19 @@ export const spotlight = {
     "Tom answers recruiters' and hiring managers' questions about my work at any hour, and can pass on a message or help book a call. I designed and built him myself, using AI throughout.",
   rows: [
     {
-      label: "The problem",
-      text: "Visitors want quick, trustworthy answers about my experience without waiting for me to reply.",
+      label: "The goal",
+      text: "Give visitors quick, reliable answers about my experience, without waiting for me to reply.",
     },
     {
       label: "Judgment calls",
-      text: "Tom only shares what I've reviewed and approved, and says so when he doesn't know. He's built to stay on topic, safe, and affordable to run.",
+      text: "Tom only shares what I've reviewed and approved, and says so when he doesn't know. Built-in limits keep him on topic and keep running costs in check.",
     },
     {
       label: "Why it matters",
-      text: "It's live on this page, not a demo, and a small example of how I bring AI to a team: useful, grounded in facts, and safe to put in front of users.",
+      highlight: true,
+      text: "It's live on this page, not a demo, and it shows how I approach AI: useful, grounded in facts I've approved, and given clear limits.",
     },
-  ],
+  ] satisfies SpotlightRow[] as SpotlightRow[],
   cta: { label: "Try Tom", href: "#ask-tom" },
 };
 
@@ -103,7 +106,7 @@ export const experience: Job[] = [
         title: "Senior Mobile Engineer",
         period: "Aug 2024 — Present",
         points: [
-          "Own core initiatives on the platform team, which owns the app's shared foundations, from requirements through release.",
+          "Own core initiatives on the platform team, from requirements through release.",
           "Built the shared sign-in platform used across Pepperstone's web and mobile apps, giving clients one secure, consistent experience and removing duplicated work across teams.",
           "Align product, design, and engineering on scope, risks, and progress.",
           "Took part in growing the engineering team to 10 people through technical interviews, and share knowledge with mid-level and junior engineers.",
@@ -116,7 +119,7 @@ export const experience: Job[] = [
         points: [
           "Delivered features for a production trading app where speed and reliability are business-critical.",
           "Made app performance measurable, so performance work could be prioritised on data.",
-          "Strengthened production readiness through monitoring, analytics, and automated releases.",
+          "Made releases more reliable and issues in production quicker to spot.",
         ],
       },
     ],
@@ -128,7 +131,7 @@ export const experience: Job[] = [
       {
         title: "Senior Frontend Engineer",
         period: "Oct 2021 — Jul 2022",
-        points: ["Delivered web features and improved the maintainability and performance of the frontend."],
+        points: ["Delivered web features and made the site faster and easier to maintain."],
       },
     ],
   },
@@ -139,7 +142,7 @@ export const experience: Job[] = [
       {
         title: "Mid-Level Frontend Engineer",
         period: "Feb 2021 — Oct 2021",
-        points: ["Built a pre-trade web application with product and design, focused on fast, data-heavy trading workflows."],
+        points: ["Built a web app for traders with product and design, focused on speed and handling large amounts of data."],
       },
     ],
   },
@@ -157,7 +160,7 @@ export const experience: Job[] = [
   },
 ];
 
-export const engineering = ["React Native", "TypeScript", "iOS", "Platform & authentication", "Performance"];
+export const engineeringSkills = ["React Native", "TypeScript", "iOS", "Platform & authentication", "Performance"];
 
 export const askTom = {
   title: "Got a question? Ask Tom",

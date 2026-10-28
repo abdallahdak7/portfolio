@@ -3,7 +3,7 @@ import { Section } from "./Section";
 
 export function Leadership() {
   return (
-    <Section id="leadership" label="02 — Approach" title="How I lead">
+    <Section id="leadership" label="02 — Approach" title="How I work">
       <p className="max-w-2xl text-[17px] leading-relaxed text-muted">{leadershipIntro}</p>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {principles.map((p, i) => (

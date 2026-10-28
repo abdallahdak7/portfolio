@@ -217,7 +217,6 @@ main > section.border-t::before {
 #experience ol.border-l > li:hover { transform: translateX(3px); }
 
 /* ---------- 7. Contact ---------- */
-
 #contact { overflow: hidden; }
 #contact::after {
   content: "";

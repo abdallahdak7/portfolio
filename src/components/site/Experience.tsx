@@ -1,4 +1,4 @@
-import { engineering, experience } from "@/content";
+import { engineeringSkills, experience } from "@/content";
 import { keepTogether } from "@/lib/text";
 import { Section } from "./Section";
 
@@ -47,7 +47,7 @@ export function Experience() {
       <div className="mt-14 border-t pt-8">
         <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-subtle">Engineering</h3>
         <ul className="mt-3 flex flex-wrap gap-2" aria-label="Engineering skills">
-          {engineering.map((s) => (
+          {engineeringSkills.map((s) => (
             <li key={s} className="rounded-full border bg-surface px-3 py-1 text-sm text-muted">
               {s}
             </li>
