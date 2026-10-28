@@ -33,6 +33,9 @@ export function eventStream(events: StreamEvent[], conversationId: string, signa
   });
 }
 
+/** Tom reads part of Abdallah's Profile. Can come before or between `text_delta`s, more than once. */
+export const profileLookup: StreamEvent = { event: "tool_status", data: { status: "looking_up_profile" } };
+
 export const rejections = {
   rate_limited: () =>
     json(

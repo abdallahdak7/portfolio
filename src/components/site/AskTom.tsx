@@ -1,7 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { ArrowUp, CalendarDays, Loader2, Mail, Mic, Square } from "lucide-react";
+import { ArrowUp, CalendarDays, Loader2, Mail, Mic, Search, Square } from "lucide-react";
 import { askTom as content } from "@/content";
-import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
+import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, PROFILE_LOOKUP_STATUS, askTom, turnstile, type MessageProgress } from "@/lib/tom";
 import { linkify } from "@/lib/text";
 import { Section } from "./Section";
 
@@ -12,6 +12,7 @@ export function AskTom() {
     draft,
     busy,
     notice,
+    lookingUpProfile,
     messageProgress,
     humanCheckNeeded,
     announcement,
@@ -47,7 +48,7 @@ export function AskTom() {
   useEffect(() => {
     const el = transcriptRef.current;
     if (el && stickToBottom.current) el.scrollTop = el.scrollHeight;
-  }, [turns, messageProgress, notice, humanCheckNeeded]);
+  }, [turns, lookingUpProfile, messageProgress, notice, humanCheckNeeded]);
 
   const onTranscriptScroll = () => {
     const el = transcriptRef.current;
@@ -146,13 +147,8 @@ export function AskTom() {
               ))}
             </ol>
 
-            {messageProgress && (
-              <p className="flex items-center gap-2 font-mono text-xs text-subtle">
-                {messageProgress.status === "sending_message" && <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />}
-                {messageProgress.status === "message_sent" && <Mail aria-hidden className="h-3.5 w-3.5 text-accent" />}
-                {messageProgress.text}
-              </p>
-            )}
+            {messageProgress && <StatusLine icon={messageProgressIcons[messageProgress.status]} text={messageProgress.text} />}
+            {lookingUpProfile && <StatusLine icon={<Search aria-hidden className="h-3.5 w-3.5" />} text={PROFILE_LOOKUP_STATUS} />}
 
             {notice && (
               <div className="rounded-2xl border border-accent/30 bg-accent-soft p-4 text-sm leading-relaxed">
@@ -238,6 +234,22 @@ export function AskTom() {
         {announcement}
       </div>
     </Section>
+  );
+}
+
+const messageProgressIcons: Record<MessageProgress, ReactNode> = {
+  sending: <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />,
+  sent: <Mail aria-hidden className="h-3.5 w-3.5 text-accent" />,
+  not_sent: null,
+};
+
+/** What Tom is doing, kept out of his reply bubble so it never reads as part of what he said. */
+function StatusLine({ icon, text }: { icon: ReactNode; text: string }) {
+  return (
+    <p className="flex items-center gap-2 font-mono text-xs text-subtle">
+      {icon}
+      {text}
+    </p>
   );
 }
 

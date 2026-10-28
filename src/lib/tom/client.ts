@@ -8,8 +8,13 @@ const MAX_HISTORY = 16;
 const MAX_SUGGESTIONS = 3;
 
 export type Turn = { role: "visitor" | "tom"; text: string };
-const TOOL_STATUSES = ["sending_message", "message_sent", "message_not_sent"] as const;
-export type ToolStatus = (typeof TOOL_STATUSES)[number];
+/** How a Message for Abdallah is getting on. */
+export type MessageProgress = "sending" | "sent" | "not_sent";
+const MESSAGE_PROGRESS = new Map<unknown, MessageProgress>([
+  ["sending_message", "sending"],
+  ["message_sent", "sent"],
+  ["message_not_sent", "not_sent"],
+]);
 
 export type Rejection =
   | { kind: "rejected"; error: "rate_limited"; message: string; fallbackEmail: string; retryAfterSeconds: number | null }
@@ -30,7 +35,9 @@ export type TurnResult =
 
 export type TurnHandlers = {
   onText?: (text: string) => void;
-  onToolStatus?: (status: ToolStatus) => void;
+  /** Tom is reading part of Abdallah's Profile. It can happen more than once in a Tom turn. */
+  onProfileLookup?: () => void;
+  onMessageProgress?: (progress: MessageProgress) => void;
 };
 
 export type Conversation = {
@@ -117,8 +124,10 @@ export function createTomClient({
           if (event === "text_delta" && typeof payload.text === "string") {
             partialReply += payload.text;
             handlers.onText?.(payload.text);
-          } else if (event === "tool_status" && TOOL_STATUSES.includes(payload.status)) {
-            handlers.onToolStatus?.(payload.status);
+          } else if (event === "tool_status") {
+            const progress = MESSAGE_PROGRESS.get(payload.status);
+            if (payload.status === "looking_up_profile") handlers.onProfileLookup?.();
+            else if (progress) handlers.onMessageProgress?.(progress);
           } else if (event === "done") {
             const visitorTurn: Turn = { role: "visitor", text: message };
             const tomTurn: Turn = { role: "tom", text: partialReply.slice(0, MAX_TOM_TURN) };
