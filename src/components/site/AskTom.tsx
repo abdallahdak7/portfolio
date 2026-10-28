@@ -223,7 +223,7 @@ export function AskTom() {
                 ? "Questions are paused for now. Try again later."
                 : listening
                   ? "Listening… It stops when you pause. Check the text, then send."
-                  : (dictationProblem ?? "Conversations are short, so ask what matters most.")}
+                  : (dictationProblem ?? "Conversations are limited, so ask what matters most.")}
             </span>
             {remaining <= 80 && <span aria-live="polite">{remaining} characters left</span>}
           </p>
