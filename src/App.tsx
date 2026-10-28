@@ -6,7 +6,6 @@ import { Leadership } from "@/components/site/Leadership";
 import { Spotlight } from "@/components/site/Spotlight";
 import { AI } from "@/components/site/AI";
 import { Experience } from "@/components/site/Experience";
-import { Skills } from "@/components/site/Skills";
 import { AskTom } from "@/components/site/AskTom";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
@@ -19,7 +18,7 @@ export default function App() {
   return (
     <>
       <a
-        href="#leadership"
+        href="#experience"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
       >
         Skip to content
@@ -27,11 +26,10 @@ export default function App() {
       <Header />
       <main>
         <Hero />
-        <Leadership />
-        <Spotlight />
-        <AI />
         <Experience />
-        <Skills />
+        <Leadership />
+        <AI />
+        <Spotlight />
         <AskTom />
         <Contact />
       </main>

@@ -195,7 +195,7 @@ export function AskTom() {
   const remaining = MAX_VISITOR_TURN - draft.length;
 
   return (
-    <Section id="ask-tom" label="06 — Ask Tom" title={askTom.title}>
+    <Section id="ask-tom" label="05 — Ask Tom" title={askTom.title}>
       <div
         ref={sectionRef}
         onPointerEnter={turnstile.preload}
