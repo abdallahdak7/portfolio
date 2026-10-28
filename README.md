@@ -6,6 +6,12 @@ Personal portfolio. Vite + React + TypeScript + Tailwind, deployed to GitHub Pag
 - `npm run dev` to develop, `npm run build` to type-check and build.
 - `npm test` runs the unit tests (Vitest).
 
+## Project docs
+
+- [`GLOSSARY.md`](./GLOSSARY.md): the words we use for the site and for Ask Tom, shared with Tom's backend.
+- [`CODING_STANDARDS.md`](./CODING_STANDARDS.md): the judgement calls code review checks. Mechanical rules live in `eslint.config.js`.
+- [`docs/adr/`](./docs/adr/): decisions that would surprise a newcomer, and why we made them.
+
 ## Ask Tom
 
 The "Ask Tom" section chats with Tom, whose backend lives in [`abdallahdak7/speak-about-abdallah`](https://github.com/abdallahdak7/speak-about-abdallah) (API contract: `docs/api.md`). The Worker and the Turnstile widget only accept `https://abdallahdaknache.com`, so `npm run dev` uses a mock instead (`src/lib/tom/mock.ts`, which lists the keywords that trigger each error path). Check against the real backend only after deploying.

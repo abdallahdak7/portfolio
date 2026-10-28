@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { initAmbient } from "@/lib/ambient";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
-import { Leadership } from "@/components/site/Leadership";
+import { Approach } from "@/components/site/Approach";
 import { Spotlight } from "@/components/site/Spotlight";
 import { AI } from "@/components/site/AI";
 import { Experience } from "@/components/site/Experience";
@@ -10,7 +10,7 @@ import { AskTom } from "@/components/site/AskTom";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 
-export default function App() {
+export function App() {
   useEffect(() => {
     initAmbient();
   }, []);
@@ -27,7 +27,7 @@ export default function App() {
       <main>
         <Hero />
         <Experience />
-        <Leadership />
+        <Approach />
         <AI />
         <Spotlight />
         <AskTom />

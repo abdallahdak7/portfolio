@@ -1,11 +1,11 @@
 import { ArrowUpRight } from "lucide-react";
-import { lookingFor, profile } from "@/content";
+import { lookingFor, about } from "@/content";
 
 export function Contact() {
   const links = [
-    { label: "LinkedIn", href: profile.linkedin },
-    { label: "Résumé (PDF)", href: profile.resume },
-    { label: "GitHub", href: profile.github },
+    { label: "LinkedIn", href: about.linkedin },
+    { label: "Résumé (PDF)", href: about.resume },
+    { label: "GitHub", href: about.github },
   ];
   const details = [
     { label: "Roles", value: lookingFor.roles },
@@ -31,10 +31,10 @@ export function Contact() {
         </dl>
 
         <a
-          href={`mailto:${profile.email}`}
+          href={`mailto:${about.email}`}
           className="mt-10 inline-block text-lg font-medium text-accent underline decoration-accent/30 underline-offset-[6px] transition-colors hover:decoration-accent sm:text-2xl"
         >
-          {profile.email}
+          {about.email}
         </a>
         <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
           {links.map((l) => (

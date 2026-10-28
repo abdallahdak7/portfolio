@@ -1,182 +1,61 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUp, CalendarDays, Loader2, Mail } from "lucide-react";
-import { askTom, profile } from "@/content";
-import { MAX_VISITOR_TURN, tom, turnstile, type Conversation, type ToolStatus, type Turn, type TurnResult } from "@/lib/tom";
+import { askTom as content } from "@/content";
+import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
+import { linkify } from "@/lib/text";
 import { Section } from "./Section";
 
-type ShownTurn = Turn & { id: number; streaming?: boolean };
-
-type Notice = { message: string; fallbackEmail?: string; bookingLink?: string };
-
-const toolStatusCopy: Record<ToolStatus, string> = {
-  sending_message: "Passing your message to Abdallah…",
-  message_sent: "Done. Your message is on its way to Abdallah.",
-  message_not_sent: `Your message didn't go through. You can email Abdallah at ${profile.email}.`,
-};
-
-const checkCopy = "Tick the box below so Tom can answer.";
-
-/** For failures without a server payload, so the Fallback email comes from the site's own content. */
-const localNotice = (problem: string): Notice => ({
-  message: `${problem}, or email Abdallah at ${profile.email}.`,
-  fallbackEmail: profile.email,
-});
-
 export function AskTom() {
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
-  const [turns, setTurns] = useState<ShownTurn[]>([]);
-  const [draft, setDraft] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [toolStatus, setToolStatus] = useState<ToolStatus | null>(null);
-  const [notice, setNotice] = useState<Notice | null>(null);
-  const [ended, setEnded] = useState(false);
-  const [blockedUntil, setBlockedUntil] = useState<number | null>(null);
-  const [announcement, setAnnouncement] = useState("");
-  const [checkNeeded, setCheckNeeded] = useState(false);
+  const {
+    suggestedQuestions,
+    turns,
+    draft,
+    busy,
+    notice,
+    messageProgress,
+    humanCheckNeeded,
+    announcement,
+    paused,
+    ended,
+    accepting,
+    canSend,
+  } = useSyncExternalStore(askTom.subscribe, askTom.getState);
 
-  const conversation = useRef<Conversation | null>(null);
-  const nextId = useRef(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stickToBottom = useRef(true);
-  // `busy` only updates on the next render, so this stops a quick double submit from sending twice.
-  const sending = useRef(false);
 
   // Load the Suggested questions once the section is close to the viewport.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-    let cancelled = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        tom.getSuggestions().then((q) => !cancelled && setSuggestedQuestions(q));
+        askTom.loadSuggestions();
       },
       { rootMargin: "400px" },
     );
     observer.observe(el);
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
-
-  useEffect(
-    () =>
-      turnstile.onInteractive((needed) => {
-        setCheckNeeded(needed);
-        if (needed) setAnnouncement(checkCopy);
-      }),
-    [],
-  );
-
-  useEffect(() => {
-    if (!blockedUntil) return;
-    const t = setTimeout(() => setBlockedUntil(null), Math.max(0, blockedUntil - Date.now()));
-    return () => clearTimeout(t);
-  }, [blockedUntil]);
 
   useEffect(() => {
     const el = transcriptRef.current;
     if (el && stickToBottom.current) el.scrollTop = el.scrollHeight;
-  }, [turns, toolStatus, notice, checkNeeded]);
+  }, [turns, messageProgress, notice, humanCheckNeeded]);
 
   const onTranscriptScroll = () => {
     const el = transcriptRef.current;
     if (el) stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
   };
 
-  const sendingPaused = busy || ended || blockedUntil !== null;
-  const trimmed = draft.trim();
-  const canSend = !sendingPaused && trimmed.length > 0 && trimmed.length <= MAX_VISITOR_TURN;
-
-  async function send(text: string) {
-    const message = text.trim();
-    if (sending.current || sendingPaused || !message || message.length > MAX_VISITOR_TURN) return;
-    sending.current = true;
-
-    conversation.current ??= tom.startConversation();
-    const visitorId = nextId.current++;
-    const tomId = nextId.current++;
+  const send = (text: string) => {
     stickToBottom.current = true;
-    setTurns((t) => [...t, { id: visitorId, role: "visitor", text: message }, { id: tomId, role: "tom", text: "", streaming: true }]);
-    setDraft("");
-    setBusy(true);
-    setNotice(null);
-    setToolStatus(null);
-    setAnnouncement("Tom is replying…");
-
-    const result = await conversation.current.sendTurn(message, {
-      onText: (piece) => setTurns((t) => t.map((x) => (x.id === tomId ? { ...x, text: x.text + piece } : x))),
-      onToolStatus: (status) => {
-        setToolStatus(status);
-        setAnnouncement(toolStatusCopy[status]);
-      },
-    });
-
-    sending.current = false;
-    setBusy(false);
-    showResult(result, { message, visitorId, tomId });
-  }
-
-  function showResult(result: TurnResult, turn: { message: string; visitorId: number; tomId: number }) {
-    const stopStreaming = () => setTurns((t) => t.map((x) => (x.id === turn.tomId ? { ...x, streaming: false } : x)));
-    // A refused turn never reached Tom: take it back out and return the text to the input.
-    const withdraw = () => {
-      setTurns((t) => t.filter((x) => x.id !== turn.visitorId && x.id !== turn.tomId));
-      setDraft((d) => d || turn.message);
-    };
-    const dropEmptyReply = (partial: string) =>
-      partial ? stopStreaming() : setTurns((t) => t.filter((x) => x.id !== turn.tomId));
-
-    switch (result.kind) {
-      case "done":
-        stopStreaming();
-        setAnnouncement(`Tom: ${result.reply}`);
-        return;
-      case "error":
-        dropEmptyReply(result.partialReply);
-        showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
-        return;
-      case "failed":
-        if (result.partialReply) stopStreaming();
-        else withdraw();
-        showNotice(localNotice("Tom can't be reached right now. Check your connection and try again"));
-        return;
-      case "unverified":
-        withdraw();
-        showNotice(localNotice("Tom needs a quick check that you're human before he can answer. Please try again"));
-        return;
-      case "invalid":
-        withdraw();
-        return;
-      case "rejected":
-        withdraw();
-        switch (result.error) {
-          case "rate_limited":
-            if (result.retryAfterSeconds) setBlockedUntil(Date.now() + result.retryAfterSeconds * 1000);
-            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
-            return;
-          case "turn_limit_reached":
-            setEnded(true);
-            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail, bookingLink: result.bookingLink });
-            return;
-          case "verification_failed":
-            setEnded(true);
-            showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
-            return;
-          default:
-            showNotice(localNotice("Tom couldn't take that question. Try asking it another way, more briefly"));
-        }
-    }
-  }
-
-  function showNotice(n: Notice) {
-    setNotice(n);
-    setAnnouncement(n.message);
-  }
+    askTom.send(text);
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -195,7 +74,7 @@ export function AskTom() {
   const remaining = MAX_VISITOR_TURN - draft.length;
 
   return (
-    <Section id="ask-tom" label="05 — Ask Tom" title={askTom.title}>
+    <Section id="ask-tom" label="05 — Ask Tom" title={content.title}>
       <div
         ref={sectionRef}
         onPointerEnter={turnstile.preload}
@@ -203,7 +82,7 @@ export function AskTom() {
         className="overflow-hidden rounded-3xl border bg-surface"
       >
         <div className="p-6 sm:p-8">
-          <p className="max-w-2xl text-[15px] leading-relaxed text-muted">{askTom.intro}</p>
+          <p className="max-w-2xl text-[15px] leading-relaxed text-muted">{content.intro}</p>
 
           {!started && suggestedQuestions.length > 0 && (
             <ul className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap" aria-label="Suggested questions">
@@ -212,7 +91,7 @@ export function AskTom() {
                   <button
                     type="button"
                     onClick={() => send(q)}
-                    disabled={sendingPaused}
+                    disabled={!accepting}
                     className="w-full rounded-2xl border bg-background px-4 py-2 text-left text-sm transition-colors hover:border-foreground/30 disabled:opacity-50 sm:w-auto sm:rounded-full"
                   >
                     {q}
@@ -245,8 +124,8 @@ export function AskTom() {
                     {t.role === "tom" ? <Linkified text={t.text} /> : t.text}
                     {t.streaming && !t.text && (
                       <span className="inline-flex items-center gap-2 text-muted">
-                        {checkNeeded ? (
-                          checkCopy
+                        {humanCheckNeeded ? (
+                          HUMAN_CHECK_PROMPT
                         ) : (
                           <>
                             <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" /> Thinking…
@@ -259,11 +138,11 @@ export function AskTom() {
               ))}
             </ol>
 
-            {toolStatus && (
+            {messageProgress && (
               <p className="flex items-center gap-2 font-mono text-xs text-subtle">
-                {toolStatus === "sending_message" && <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />}
-                {toolStatus === "message_sent" && <Mail aria-hidden className="h-3.5 w-3.5 text-accent" />}
-                {toolStatusCopy[toolStatus]}
+                {messageProgress.status === "sending_message" && <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />}
+                {messageProgress.status === "message_sent" && <Mail aria-hidden className="h-3.5 w-3.5 text-accent" />}
+                {messageProgress.text}
               </p>
             )}
 
@@ -301,7 +180,7 @@ export function AskTom() {
               id="ask-tom-input"
               ref={inputRef}
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => askTom.setDraft(e.target.value)}
               onKeyDown={onKeyDown}
               maxLength={MAX_VISITOR_TURN}
               rows={1}
@@ -321,7 +200,7 @@ export function AskTom() {
           </div>
           <p id="ask-tom-hint" className="mt-2 flex justify-between gap-4 px-1 font-mono text-[11px] text-subtle">
             <span>
-              {blockedUntil ? "Questions are paused for now. Try again later." : "Up to 8 questions per chat. Press Enter to send."}
+              {paused ? "Questions are paused for now. Try again later." : "Up to 8 questions per chat. Press Enter to send."}
             </span>
             {remaining <= 80 && <span aria-live="polite">{remaining} characters left</span>}
           </p>
@@ -347,21 +226,19 @@ function PillLink({ href, external, children }: { href: string; external?: boole
   );
 }
 
-const LINK = /(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"]|[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[a-z]{2,})/gi;
-
 /** Turns URLs and email addresses in plain text into links. */
 function Linkified({ text }: { text: string }) {
   return (
     <>
-      {text.split(LINK).map((part, i) => {
-        if (i % 2 === 0) return part;
-        const href = part.includes("@") && !part.startsWith("http") ? `mailto:${part}` : part;
-        return (
-          <a key={i} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="link-underline text-accent">
+      {linkify(text).map(({ text: part, href }, i) =>
+        href ? (
+          <a key={i} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
             {part}
           </a>
-        );
-      })}
+        ) : (
+          part
+        ),
+      )}
     </>
   );
 }

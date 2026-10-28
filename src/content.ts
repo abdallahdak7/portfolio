@@ -1,4 +1,4 @@
-export const profile = {
+export const about = {
   name: "Abdallah Daknache",
   role: "Senior Mobile Engineer",
   company: "Pepperstone",
@@ -21,7 +21,7 @@ export const glance = [
   { label: "Domain", value: "Fintech · Trading" },
 ];
 
-export const leadershipIntro =
+export const approachIntro =
   "I connect systems, people, and product goals, and choose solutions that hold up over time without adding unnecessary complexity.";
 
 export const principles = [

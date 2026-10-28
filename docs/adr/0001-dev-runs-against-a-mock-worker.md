@@ -1,0 +1,3 @@
+# Dev runs Ask Tom against a mock Worker
+
+Tom's Worker and the Turnstile widget only accept requests from `https://abdallahdaknache.com`, so `npm run dev` swaps in an in-browser mock of the Worker (`src/lib/tom/mock.ts`) and a stub Human check instead of calling the real backend. We chose this over allow-listing localhost on the Worker, which would weaken its origin check, and over a local copy of the backend, which would drag a second repo into everyday frontend work. The mock is built from the same response fixtures as the tests, so it can't drift from what the tests assert. The cost is that the real Worker is only exercised after deploy, so changes to the API contract (`docs/api.md` in `abdallahdak7/speak-about-abdallah`) must be checked on the live site.

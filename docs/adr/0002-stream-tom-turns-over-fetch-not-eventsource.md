@@ -1,0 +1,3 @@
+# Stream Tom turns over fetch, with our own event-stream reader
+
+Tom's reply arrives as a `text/event-stream`, but the request is a `POST` carrying the history and a Turnstile token, and the browser's `EventSource` can only `GET`. So the client reads the stream from `fetch` with a small hand-written reader (`src/lib/tom/sse.ts`) rather than adding an SSE library. That keeps the runtime dependencies to React and the icon set, and gives us the behaviour the client relies on: an event the stream cuts off is dropped, so a truncated stream never looks like a finished Tom turn. Don't swap in `EventSource`; it can't send the request body.
