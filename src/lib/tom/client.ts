@@ -21,8 +21,10 @@ export type TurnResult =
   | { kind: "done"; reply: string }
   /** The stream ended with an `error` event. The turn still counts against the Conversation. */
   | { kind: "error"; message: string; fallbackEmail: string; partialReply: string }
-  /** Network failure, an unexpected response, a stream that stopped early, or no Turnstile token. */
+  /** Network failure, an unexpected response, or a stream that stopped early. */
   | { kind: "failed"; partialReply: string }
+  /** No Turnstile token could be had (challenge failed or timed out), so nothing was sent. */
+  | { kind: "unverified" }
   | { kind: "invalid"; reason: "blank" | "too_long" }
   | Rejection;
 
@@ -150,7 +152,7 @@ export function createTomClient({
           }
           return first;
         } catch (e) {
-          if (e instanceof NoToken) return { kind: "failed", partialReply: "" };
+          if (e instanceof NoToken) return { kind: "unverified" };
           throw e;
         }
       },

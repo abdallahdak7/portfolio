@@ -178,7 +178,7 @@ describe("sendTurn", () => {
     expect(await client.startConversation().sendTurn("hi")).toEqual({ kind: "failed", partialReply: "Abd" });
   });
 
-  it("fails without a request when no Turnstile token can be had", async () => {
+  it("is unverified, without a request, when no Turnstile token can be had", async () => {
     const { fetch, calls } = fakeFetch();
     const client = createTomClient({
       baseUrl: BASE,
@@ -187,7 +187,7 @@ describe("sendTurn", () => {
         throw new Error("challenge failed");
       },
     });
-    expect(await client.startConversation().sendTurn("hi")).toEqual({ kind: "failed", partialReply: "" });
+    expect(await client.startConversation().sendTurn("hi")).toEqual({ kind: "unverified" });
     expect(calls).toHaveLength(0);
   });
 

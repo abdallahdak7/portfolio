@@ -14,6 +14,8 @@ const toolStatusCopy: Record<ToolStatus, string> = {
   message_not_sent: `Your message didn't go through. You can email Abdallah at ${profile.email}.`,
 };
 
+const checkCopy = "Tick the box below so Tom can answer.";
+
 /** For failures without a server payload, so the Fallback email comes from the site's own content. */
 const localNotice = (problem: string): Notice => ({
   message: `${problem}, or email Abdallah at ${profile.email}.`,
@@ -30,6 +32,7 @@ export function AskTom() {
   const [ended, setEnded] = useState(false);
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [checkNeeded, setCheckNeeded] = useState(false);
 
   const conversation = useRef<Conversation | null>(null);
   const nextId = useRef(0);
@@ -60,6 +63,15 @@ export function AskTom() {
     };
   }, []);
 
+  useEffect(
+    () =>
+      turnstile.onInteractive((needed) => {
+        setCheckNeeded(needed);
+        if (needed) setAnnouncement(checkCopy);
+      }),
+    [],
+  );
+
   useEffect(() => {
     if (!blockedUntil) return;
     const t = setTimeout(() => setBlockedUntil(null), Math.max(0, blockedUntil - Date.now()));
@@ -69,7 +81,7 @@ export function AskTom() {
   useEffect(() => {
     const el = transcriptRef.current;
     if (el && stickToBottom.current) el.scrollTop = el.scrollHeight;
-  }, [turns, toolStatus, notice]);
+  }, [turns, toolStatus, notice, checkNeeded]);
 
   const onTranscriptScroll = () => {
     const el = transcriptRef.current;
@@ -132,6 +144,10 @@ export function AskTom() {
         if (result.partialReply) stopStreaming();
         else withdraw();
         showNotice(localNotice("Tom can't be reached right now. Check your connection and try again"));
+        return;
+      case "unverified":
+        withdraw();
+        showNotice(localNotice("Tom needs a quick check that you're human before he can answer. Please try again"));
         return;
       case "invalid":
         withdraw();
@@ -229,7 +245,13 @@ export function AskTom() {
                     {t.role === "tom" ? <Linkified text={t.text} /> : t.text}
                     {t.streaming && !t.text && (
                       <span className="inline-flex items-center gap-2 text-muted">
-                        <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" /> Thinking…
+                        {checkNeeded ? (
+                          checkCopy
+                        ) : (
+                          <>
+                            <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" /> Thinking…
+                          </>
+                        )}
                       </span>
                     )}
                   </div>

@@ -3,17 +3,22 @@ import { createTurnstile } from "./turnstile";
 
 /** A fake `window.turnstile` that solves each execute with the next token when told to. */
 function fakeTurnstileApi() {
-  let callback: (token: string) => void = () => {};
+  type Options = { callback: (t: string) => void; "before-interactive-callback": () => void };
+  let options: Options | null = null;
   const api = {
-    render: vi.fn((_el: unknown, options: { callback: (t: string) => void }) => {
-      callback = options.callback;
+    render: vi.fn((_el: unknown, o: Options) => {
+      options = o;
       return "widget-1";
     }),
     execute: vi.fn(),
     reset: vi.fn(),
     remove: vi.fn(),
   };
-  return { api, solve: (token: string) => callback(token) };
+  return {
+    api,
+    solve: (token: string) => options?.callback(token),
+    askVisitor: () => options?.["before-interactive-callback"](),
+  };
 }
 
 afterEach(() => {
@@ -72,5 +77,21 @@ describe("createTurnstile", () => {
     const outcome = expect(token).rejects.toThrow("timed out");
     await vi.advanceTimersByTimeAsync(120_000);
     await outcome;
+  });
+
+  it("reports when the challenge waits on the Visitor, until it's solved", async () => {
+    const { api, solve, askVisitor } = fakeTurnstileApi();
+    vi.stubGlobal("window", { turnstile: api });
+    const turnstile = createTurnstile("site-key");
+    turnstile.attach({} as HTMLElement);
+    const seen: boolean[] = [];
+    turnstile.onInteractive((needed) => seen.push(needed));
+
+    const token = turnstile.getToken();
+    await vi.waitFor(() => expect(api.execute).toHaveBeenCalledTimes(1));
+    askVisitor();
+    solve("t1");
+    await token;
+    expect(seen).toEqual([true, false]);
   });
 });
