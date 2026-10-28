@@ -17,7 +17,7 @@ export const turnstile: Turnstile = import.meta.env.DEV
   ? { attach() {}, preload() {}, getToken: mockTurnstileToken, onInteractive: () => () => {} }
   : createTurnstile(TURNSTILE_SITE_KEY);
 
-export const tom = import.meta.env.DEV
+const tom = import.meta.env.DEV
   ? createTomClient({ baseUrl: BASE_URL, fetch: mockFetch, getTurnstileToken: turnstile.getToken })
   : createTomClient({ baseUrl: BASE_URL, getTurnstileToken: turnstile.getToken });
 

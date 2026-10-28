@@ -11,6 +11,8 @@ export type ShownTurn = Turn & { id: number; streaming: boolean };
 export type Notice = { message: string; fallbackEmail?: string; bookingLink?: string };
 
 export type AskTomState = {
+  /** Shown before the Conversation starts. Empty until `loadSuggestions` has them. */
+  suggestedQuestions: string[];
   turns: ShownTurn[];
   draft: string;
   /** A Visitor turn is on its way to Tom. */
@@ -26,14 +28,20 @@ export type AskTomState = {
   paused: boolean;
   /** The Conversation reached its turn limit or the Visitor couldn't be verified; nothing more can be sent. */
   ended: boolean;
-  /** The draft can be sent now. */
+  /** Tom will take a Visitor turn now: not busy, Paused or Ended. */
+  accepting: boolean;
+  /** Tom is accepting and the draft can be sent. */
   canSend: boolean;
 };
+
+type Derived = "accepting" | "canSend";
 
 export type AskTom = {
   getState(): AskTomState;
   /** Calls the listener after every state change. Returns an unsubscribe. */
   subscribe(listener: () => void): () => void;
+  /** Fetches the Suggested questions. Only the first call fetches; later calls return the same promise. */
+  loadSuggestions(): Promise<void>;
   setDraft(text: string): void;
   /** Sends one Visitor turn. Resolves once Tom's reply has finished or the turn was withdrawn. */
   send(text: string): Promise<void>;
@@ -47,6 +55,7 @@ export type AskTomOptions = {
 
 export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions): AskTom {
   let state: AskTomState = {
+    suggestedQuestions: [],
     turns: [],
     draft: "",
     busy: false,
@@ -56,15 +65,18 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
     announcement: "",
     paused: false,
     ended: false,
+    accepting: true,
     canSend: false,
   };
   const listeners = new Set<() => void>();
   const conversation = tom.startConversation();
   let nextId = 0;
+  let suggestions: Promise<void> | null = null;
 
-  const update = (change: Partial<Omit<AskTomState, "canSend">>) => {
+  const update = (change: Partial<Omit<AskTomState, Derived>>) => {
     const next = { ...state, ...change };
-    state = { ...next, canSend: sendable(next, next.draft) };
+    const accepting = !next.busy && !next.paused && !next.ended;
+    state = { ...next, accepting, canSend: accepting && sendable(next.draft) };
     listeners.forEach((l) => l());
   };
   /** For failures without a server payload, so the Fallback email comes from the site's own content. */
@@ -97,13 +109,18 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
       return () => listeners.delete(listener);
     },
 
+    loadSuggestions() {
+      suggestions ??= tom.getSuggestions().then((suggestedQuestions) => update({ suggestedQuestions }));
+      return suggestions;
+    },
+
     setDraft(text) {
       update({ draft: text });
     },
 
     async send(text) {
       const message = text.trim();
-      if (!sendable(state, message)) return;
+      if (!state.accepting || !sendable(message)) return;
       const visitorId = nextId++;
       const tomId = nextId++;
       update({
@@ -182,7 +199,7 @@ export function createAskTom({ tom, humanCheck, fallbackEmail }: AskTomOptions):
   };
 }
 
-function sendable({ busy, paused, ended }: Omit<AskTomState, "canSend">, text: string) {
+function sendable(text: string) {
   const message = text.trim();
-  return !busy && !paused && !ended && message.length > 0 && message.length <= MAX_VISITOR_TURN;
+  return message.length > 0 && message.length <= MAX_VISITOR_TURN;
 }

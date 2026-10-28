@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
-import { BOOKING_LINK, eventStream, rejections, streamError, type StreamEvent } from "./fixtures";
+import { BOOKING_LINK, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
 
 const ID = "11111111-1111-4111-8111-111111111111";
 const EMAIL = "abdallah.daknache@gmail.com";
@@ -85,6 +85,7 @@ describe("Ask Tom", () => {
     await askTom.send("hi");
     expect(askTom.getState()).toMatchObject({
       paused: true,
+      accepting: false,
       canSend: false,
       notice: { message: expect.stringContaining("Too many questions"), fallbackEmail: EMAIL },
     });
@@ -92,7 +93,7 @@ describe("Ask Tom", () => {
     await vi.advanceTimersByTimeAsync(29_000);
     expect(askTom.getState().paused).toBe(true);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(askTom.getState()).toMatchObject({ paused: false, canSend: true });
+    expect(askTom.getState()).toMatchObject({ paused: false, accepting: true, canSend: true });
   });
 
   it("is Ended at the turn limit, offering the Booking link, and sends nothing more", async () => {
@@ -103,6 +104,7 @@ describe("Ask Tom", () => {
 
     expect(askTom.getState()).toMatchObject({
       ended: true,
+      accepting: false,
       canSend: false,
       turns: [],
       notice: { message: expect.stringContaining("reached its limit"), bookingLink: BOOKING_LINK, fallbackEmail: EMAIL },
@@ -118,6 +120,24 @@ describe("Ask Tom", () => {
       ended: true,
       notice: { message: expect.stringContaining("reload the page"), fallbackEmail: EMAIL },
     });
+  });
+
+  it("loads the Suggested questions only once", async () => {
+    const { askTom } = setup(json(200, { questions: ["What does he build?", "Is he open to Lead roles?"] }));
+
+    await Promise.all([askTom.loadSuggestions(), askTom.loadSuggestions()]);
+    await askTom.loadSuggestions();
+
+    expect(askTom.getState().suggestedQuestions).toEqual(["What does he build?", "Is he open to Lead roles?"]);
+  });
+
+  it("takes no Suggested question while a Visitor turn is on its way", async () => {
+    const { askTom } = setup(eventStream(reply("Hi."), ID));
+
+    const sending = askTom.send("hi");
+    expect(askTom.getState()).toMatchObject({ busy: true, accepting: false });
+    await sending;
+    expect(askTom.getState().accepting).toBe(true);
   });
 
   it("sends a quick double submit only once", async () => {

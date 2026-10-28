@@ -18,6 +18,13 @@ describe("linkify", () => {
     ]);
   });
 
+  it("keeps a URL written in capitals a link, not an email", () => {
+    expect(linkify("See HTTPS://cal.com/abdallah")).toEqual([
+      { text: "See " },
+      { text: "HTTPS://cal.com/abdallah", href: "HTTPS://cal.com/abdallah" },
+    ]);
+  });
+
   it("leaves sentence punctuation and a closing bracket out of the link", () => {
     expect(linkify("(see https://cal.com/abdallah).")).toEqual([
       { text: "(see " },

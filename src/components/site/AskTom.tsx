@@ -1,14 +1,25 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUp, CalendarDays, Loader2, Mail } from "lucide-react";
 import { askTom as content } from "@/content";
-import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, tom, turnstile } from "@/lib/tom";
+import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
 import { linkify } from "@/lib/text";
 import { Section } from "./Section";
 
 export function AskTom() {
-  const { turns, draft, busy, notice, messageProgress, humanCheckNeeded, announcement, paused, ended, canSend } =
-    useSyncExternalStore(askTom.subscribe, askTom.getState);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+  const {
+    suggestedQuestions,
+    turns,
+    draft,
+    busy,
+    notice,
+    messageProgress,
+    humanCheckNeeded,
+    announcement,
+    paused,
+    ended,
+    accepting,
+    canSend,
+  } = useSyncExternalStore(askTom.subscribe, askTom.getState);
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -19,20 +30,16 @@ export function AskTom() {
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-    let cancelled = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        tom.getSuggestions().then((q) => !cancelled && setSuggestedQuestions(q));
+        askTom.loadSuggestions();
       },
       { rootMargin: "400px" },
     );
     observer.observe(el);
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -84,7 +91,7 @@ export function AskTom() {
                   <button
                     type="button"
                     onClick={() => send(q)}
-                    disabled={busy || paused || ended}
+                    disabled={!accepting}
                     className="w-full rounded-2xl border bg-background px-4 py-2 text-left text-sm transition-colors hover:border-foreground/30 disabled:opacity-50 sm:w-auto sm:rounded-full"
                   >
                     {q}
@@ -225,7 +232,7 @@ function Linkified({ text }: { text: string }) {
     <>
       {linkify(text).map(({ text: part, href }, i) =>
         href ? (
-          <a key={i} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="link-underline text-accent">
+          <a key={i} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
             {part}
           </a>
         ) : (

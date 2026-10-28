@@ -11,7 +11,7 @@ export function linkify(text: string): TextPart[] {
     .split(LINK)
     .map((part, i) => {
       if (i % 2 === 0) return { text: part };
-      return { text: part, href: part.startsWith("http") ? part : `mailto:${part}` };
+      return { text: part, href: /^https?:/i.test(part) ? part : `mailto:${part}` };
     })
     .filter((p) => p.text !== "");
 }
