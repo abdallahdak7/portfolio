@@ -46,6 +46,6 @@ Judgement calls a reviewer checks. Mechanical rules (no default exports, no `enu
 ## Tests
 
 - Test only at agreed seams, through the module's interface. If a test has to change when the implementation changes but the behaviour doesn't, it is testing past the interface.
-- Fake only at the system edge (`fetch`, `window.turnstile`, time). Don't mock our own modules: drive the real `createTomClient` with a fake `fetch`.
+- Fake only at the system edge (`fetch`, `window.turnstile`, speech recognition, time). Don't mock our own modules: drive the real `createTomClient` with a fake `fetch`.
 - Expected values come from an independent source, such as a literal, a fixture or the API contract, never from recomputing the code's logic.
 - Test names state behaviour in glossary terms ("withdraws a refused Visitor turn"), not mechanics ("calls setTurns").

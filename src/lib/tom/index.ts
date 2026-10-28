@@ -1,4 +1,5 @@
 import { about } from "@/content";
+import { browserSpeechRecognition } from "@/lib/speech";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
 import { mockFetch, mockTurnstileToken } from "./mock";
@@ -21,4 +22,9 @@ const tom = import.meta.env.DEV
   ? createTomClient({ baseUrl: BASE_URL, fetch: mockFetch, getTurnstileToken: turnstile.getToken })
   : createTomClient({ baseUrl: BASE_URL, getTurnstileToken: turnstile.getToken });
 
-export const askTom = createAskTom({ tom, humanCheck: turnstile, fallbackEmail: about.email });
+export const askTom = createAskTom({
+  tom,
+  humanCheck: turnstile,
+  fallbackEmail: about.email,
+  speechRecognition: browserSpeechRecognition(),
+});

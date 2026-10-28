@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { SpeechRecognition } from "@/lib/speech";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
 import { BOOKING_LINK, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
@@ -20,6 +21,53 @@ const reply = (...parts: string[]): StreamEvent[] => [
   ...parts.map((text) => ({ event: "text_delta", data: { text } })),
   { event: "done", data: {} },
 ];
+
+/** A fake browser speech recognition. Each `new` is kept in `instances`, so a test can speak into the latest. */
+function fakeSpeechRecognition() {
+  const instances: FakeRecognition[] = [];
+  class FakeRecognition implements SpeechRecognition {
+    continuous = true;
+    interimResults = false;
+    onresult: SpeechRecognition["onresult"] = null;
+    onerror: SpeechRecognition["onerror"] = null;
+    onend: SpeechRecognition["onend"] = null;
+    started = false;
+    constructor() {
+      instances.push(this);
+    }
+    start() {
+      this.started = true;
+    }
+    stop() {
+      this.onend?.();
+    }
+    abort() {
+      this.onerror?.({ error: "aborted" });
+      this.onend?.();
+    }
+    /** Delivers everything heard so far, one phrase per string. */
+    hear(...phrases: string[]) {
+      this.onresult?.({ results: phrases.map((transcript) => [{ transcript }]) });
+    }
+    fail(error: string) {
+      this.onerror?.({ error });
+      this.onend?.();
+    }
+  }
+  return { SpeechRecognition: FakeRecognition, latest: () => instances[instances.length - 1] };
+}
+
+function setupWithSpeech(...responses: (Response | Error)[]) {
+  const speech = fakeSpeechRecognition();
+  const tom = createTomClient({ baseUrl: "https://tom.test", fetch: scriptedFetch(responses), getTurnstileToken: async () => "token" });
+  const askTom = createAskTom({
+    tom,
+    fallbackEmail: EMAIL,
+    humanCheck: { onInteractive: () => () => {} },
+    speechRecognition: speech.SpeechRecognition,
+  });
+  return { askTom, speech };
+}
 
 function setup(...responses: (Response | Error)[]) {
   return setupWithToken(async () => "token", ...responses);
@@ -259,5 +307,116 @@ describe("Ask Tom", () => {
     await askTom.send("Pass this on");
 
     expect(announced).toEqual(["Tom is replying…", "Passing your message to Abdallah…", "Tom: Sent."]);
+  });
+});
+
+describe("Dictation", () => {
+  it("is unsupported where the browser has no speech recognition", () => {
+    const { askTom } = setup();
+
+    askTom.startDictation();
+
+    expect(askTom.getState().dictation).toBe("unsupported");
+  });
+
+  it("writes what the Visitor says into the draft as it's heard, without sending", async () => {
+    const { askTom, speech } = setupWithSpeech();
+
+    askTom.startDictation();
+    expect(askTom.getState()).toMatchObject({ dictation: "listening", announcement: "Listening…" });
+    expect(speech.latest()).toMatchObject({ started: true, continuous: false, interimResults: true });
+
+    speech.latest().hear("what does");
+    expect(askTom.getState().draft).toBe("what does");
+    speech.latest().hear("what does he build");
+    speech.latest().stop();
+
+    expect(askTom.getState()).toMatchObject({
+      draft: "what does he build",
+      dictation: "off",
+      announcement: "Stopped listening.",
+      turns: [],
+      canSend: true,
+    });
+  });
+
+  it("adds what's heard after what the Visitor already typed", () => {
+    const { askTom, speech } = setupWithSpeech();
+    askTom.setDraft("Hi Tom. ");
+
+    askTom.startDictation();
+    speech.latest().hear("what does he build");
+
+    expect(askTom.getState().draft).toBe("Hi Tom. what does he build");
+  });
+
+  it("keeps the draft within the Visitor turn limit", () => {
+    const { askTom, speech } = setupWithSpeech();
+
+    askTom.startDictation();
+    speech.latest().hear("a".repeat(450));
+
+    expect(askTom.getState().draft).toHaveLength(400);
+  });
+
+  it("stops when the Visitor types, so nothing heard later overwrites the typing", () => {
+    const { askTom, speech } = setupWithSpeech();
+    askTom.startDictation();
+    speech.latest().hear("what does");
+    const dictating = speech.latest();
+
+    askTom.setDraft("what does he do?");
+    dictating.hear("what does he build");
+
+    expect(askTom.getState()).toMatchObject({ draft: "what does he do?", dictation: "off" });
+  });
+
+  it("stops when the Visitor sends, so nothing heard late lands in the next draft", async () => {
+    const { askTom, speech } = setupWithSpeech(eventStream(reply("He builds apps."), ID));
+    askTom.startDictation();
+    const dictating = speech.latest();
+    dictating.hear("what does he build");
+
+    await askTom.send(askTom.getState().draft);
+    dictating.hear("what does he build for fun");
+
+    expect(askTom.getState()).toMatchObject({ draft: "", dictation: "off" });
+    expect(askTom.getState().turns.map((t) => t.text)).toEqual(["what does he build", "He builds apps."]);
+  });
+
+  it("says why when the microphone is blocked, and leaves the draft alone", () => {
+    const { askTom, speech } = setupWithSpeech();
+    askTom.setDraft("typed so far");
+
+    askTom.startDictation();
+    speech.latest().fail("not-allowed");
+
+    const problem = "Microphone access is blocked. Allow it in your browser to speak your question, or type it.";
+    expect(askTom.getState()).toMatchObject({
+      draft: "typed so far",
+      dictation: "off",
+      dictationProblem: problem,
+      announcement: problem,
+    });
+  });
+
+  it("clears the last problem when the Visitor tries again", () => {
+    const { askTom, speech } = setupWithSpeech();
+    askTom.startDictation();
+    speech.latest().fail("no-speech");
+
+    askTom.startDictation();
+
+    expect(askTom.getState()).toMatchObject({ dictation: "listening", dictationProblem: null });
+  });
+
+  it("doesn't listen once the Conversation is Ended", async () => {
+    const { askTom, speech } = setupWithSpeech(rejections.turn_limit_reached());
+    await askTom.send("hi");
+
+    askTom.startDictation();
+
+    expect(askTom.getState().dictation).toBe("off");
+    expect(speech.latest()).toBeUndefined();
   });
 });
