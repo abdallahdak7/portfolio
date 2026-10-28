@@ -7,7 +7,7 @@ export function AI() {
     <Section id="ai" label="03 — AI" title="AI-first engineering">
       <div className="rounded-3xl border bg-surface p-6 sm:p-10">
         <div className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
-          <Sparkles className="h-3.5 w-3.5" /> Part of my daily routine
+          <Sparkles aria-hidden className="h-3.5 w-3.5" /> {ai.badge}
         </div>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed sm:text-xl">{ai.intro}</p>
         <div className="mt-10 grid gap-8 border-t pt-8 md:grid-cols-3 md:gap-6">

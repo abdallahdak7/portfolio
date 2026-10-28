@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { profile } from "@/content";
 
 const links = [
-  { href: "#leadership", label: "Approach" },
-  { href: "#spotlight", label: "Spotlight" },
-  { href: "#ai", label: "AI" },
   { href: "#experience", label: "Experience" },
+  { href: "#leadership", label: "Approach" },
+  { href: "#ai", label: "AI" },
+  { href: "#spotlight", label: "Spotlight" },
   { href: "#ask-tom", label: "Ask Tom" },
   { href: "#contact", label: "Contact" },
 ];

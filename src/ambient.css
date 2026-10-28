@@ -216,10 +216,7 @@ main > section.border-t::before {
 #experience ol.border-l > li { transition: transform .3s; }
 #experience ol.border-l > li:hover { transform: translateX(3px); }
 
-/* ---------- 7. Skills + contact ---------- */
-#skills dl > div { transition: background-color .25s, padding .25s; }
-#skills dl > div:hover { background: linear-gradient(90deg, hsl(var(--accent) / .06), transparent 70%); padding-left: .75rem; }
-
+/* ---------- 7. Contact ---------- */
 #contact { overflow: hidden; }
 #contact::after {
   content: "";

@@ -43,40 +43,43 @@ export const principles = [
   },
 ];
 
+export type SpotlightRow = { label: string; text: string; highlight?: boolean };
+
 export const spotlight = {
-  title: "One sign-in for web and mobile",
-  tag: "Platform · Ownership",
+  title: "Tom, the AI assistant on this page",
+  tag: "AI · Personal project",
+  summary:
+    "Tom answers recruiters' and hiring managers' questions about my work at any hour, and can pass on a message or help book a call. I designed and built him myself, using AI throughout.",
   rows: [
     {
-      label: "Goal",
-      text: "Give clients one secure, consistent way to sign in across Pepperstone's website and apps, and stop each product team from building its own.",
+      label: "The goal",
+      text: "Give visitors quick, reliable answers about my experience, without waiting for me to reply.",
     },
     {
-      label: "What I did",
-      text: "Designed and built the shared authentication module the platform team provides to web and mobile, and own it as a foundation other teams build on.",
+      label: "Judgment calls",
+      text: "Tom only shares what I've reviewed and approved, and says so when he doesn't know. Built-in limits keep him on topic and keep running costs in check.",
     },
     {
-      label: "Key decision",
-      text: "Rely on industry standards and a trusted identity provider rather than custom security, and ship it as one module every platform reuses.",
+      label: "Why it matters",
+      highlight: true,
+      text: "It's live on this page, not a demo, and it shows how I approach AI: useful, grounded in facts I've approved, and given clear limits.",
     },
-    {
-      label: "Impact",
-      text: "One source of truth for sign-in: a consistent client experience, a smaller security surface in a regulated business, and less duplicated work across teams.",
-    },
-  ],
+  ] satisfies SpotlightRow[] as SpotlightRow[],
+  cta: { label: "Try Tom", href: "#ask-tom" },
 };
 
 export const ai = {
+  badge: "Daily practice, not an experiment",
   intro:
-    "AI is part of how I work every day, not an experiment. I focus on turning it into real productivity, for me and for the team, safely, in a regulated product.",
+    "I focus on turning AI into real productivity, for me and for the team, while keeping it safe in a regulated product.",
   pillars: [
     {
       title: "In my daily work",
-      body: "Cursor and Claude support me from planning to code, review, testing, and documentation, so my time goes to decisions rather than repetition.",
+      body: "AI supports me from planning to code, review, testing, and documentation, so my time goes to decisions rather than repetition.",
     },
     {
       title: "Across the team",
-      body: "I share reusable AI workflows with my team and keep trying new models and agents, so we adopt what genuinely works.",
+      body: "I share reusable AI workflows with my team and keep trying new AI tools, so we adopt what genuinely works.",
     },
     {
       title: "With guardrails",
@@ -103,8 +106,8 @@ export const experience: Job[] = [
         title: "Senior Mobile Engineer",
         period: "Aug 2024 — Present",
         points: [
-          "Own core initiatives on the platform team, which owns the app's shared foundations, from requirements through release.",
-          "Built the shared sign-in platform used across Pepperstone's web and mobile apps.",
+          "Own core initiatives on the platform team, from requirements through release.",
+          "Built the shared sign-in platform used across Pepperstone's web and mobile apps, giving clients one secure, consistent experience and removing duplicated work across teams.",
           "Align product, design, and engineering on scope, risks, and progress.",
           "Took part in growing the engineering team to 10 people through technical interviews, and share knowledge with mid-level and junior engineers.",
           "Champion AI adoption in the team by sharing reusable workflows that make engineers more efficient.",
@@ -116,7 +119,7 @@ export const experience: Job[] = [
         points: [
           "Delivered features for a production trading app where speed and reliability are business-critical.",
           "Made app performance measurable, so performance work could be prioritised on data.",
-          "Strengthened production readiness through monitoring, analytics, and automated releases.",
+          "Made releases more reliable and issues in production quicker to spot.",
         ],
       },
     ],
@@ -128,7 +131,7 @@ export const experience: Job[] = [
       {
         title: "Senior Frontend Engineer",
         period: "Oct 2021 — Jul 2022",
-        points: ["Delivered web features and improved the maintainability and performance of the frontend."],
+        points: ["Delivered web features and made the site faster and easier to maintain."],
       },
     ],
   },
@@ -139,7 +142,7 @@ export const experience: Job[] = [
       {
         title: "Mid-Level Frontend Engineer",
         period: "Feb 2021 — Oct 2021",
-        points: ["Built a pre-trade web application with product and design, focused on fast, data-heavy trading workflows."],
+        points: ["Built a web app for traders with product and design, focused on speed and handling large amounts of data."],
       },
     ],
   },
@@ -151,25 +154,22 @@ export const experience: Job[] = [
       {
         title: "Junior Backend Engineer",
         period: "May 2019 — Jun 2020",
-        points: ["Built backend services and APIs, including business logic and third-party integrations."],
+        points: ["Built the backend services behind the product, including integrations with third-party providers."],
       },
     ],
   },
 ];
 
-export const skills = [
-  { group: "Ways of working", items: ["Initiative ownership", "Cross-team delivery", "Knowledge sharing", "Technical interviewing"] },
-  { group: "AI", items: ["AI-first engineering", "Team AI enablement"] },
-  { group: "Engineering", items: ["React Native", "TypeScript", "iOS", "Platform & authentication", "Performance"] },
-];
+export const engineeringSkills = ["React Native", "TypeScript", "iOS", "Platform & authentication", "Performance"];
 
 export const askTom = {
   title: "Got a question? Ask Tom",
   intro:
-    "Tom is an AI assistant who answers questions about my work and experience, using a profile I've reviewed and approved. He can also pass a message on to me or share a link to book a call. Tom can get things wrong, so check anything important with me directly.",
+    "Ask Tom about my work and experience. He answers from a profile I've reviewed and approved, and can pass a message on to me or share a link to book a call. Tom can get things wrong, so check anything important with me directly.",
 };
 
 export const lookingFor = {
+  title: "Hiring for a mobile lead or senior mobile engineer? Let's talk.",
   roles: "Mobile Lead / Tech Lead or Senior Mobile Engineer",
   where: "Cyprus (hybrid) or relocation",
   domains: "Fintech and product-led companies",

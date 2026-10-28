@@ -1,10 +1,10 @@
-import { experience } from "@/content";
+import { engineeringSkills, experience } from "@/content";
 import { keepTogether } from "@/lib/text";
 import { Section } from "./Section";
 
 export function Experience() {
   return (
-    <Section id="experience" label="04 — Experience" title="Where I've worked">
+    <Section id="experience" label="01 — Experience" title="Where I've worked">
       <ol className="space-y-14">
         {experience.map((job) => (
           <li key={job.company} className="relative">
@@ -43,6 +43,17 @@ export function Experience() {
           </li>
         ))}
       </ol>
+
+      <div className="mt-14 border-t pt-8">
+        <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-subtle">Engineering</h3>
+        <ul className="mt-3 flex flex-wrap gap-2" aria-label="Engineering skills">
+          {engineeringSkills.map((s) => (
+            <li key={s} className="rounded-full border bg-surface px-3 py-1 text-sm text-muted">
+              {s}
+            </li>
+          ))}
+        </ul>
+      </div>
     </Section>
   );
 }
