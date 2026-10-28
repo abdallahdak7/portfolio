@@ -1,7 +1,10 @@
+import { about } from "@/content";
+import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
 import { mockFetch, mockTurnstileToken } from "./mock";
 import { createTurnstile, type Turnstile } from "./turnstile";
 
+export * from "./askTom";
 export * from "./client";
 
 const BASE_URL = "https://speak-about-abdallah.abdallah-daknache.workers.dev";
@@ -17,3 +20,5 @@ export const turnstile: Turnstile = import.meta.env.DEV
 export const tom = import.meta.env.DEV
   ? createTomClient({ baseUrl: BASE_URL, fetch: mockFetch, getTurnstileToken: turnstile.getToken })
   : createTomClient({ baseUrl: BASE_URL, getTurnstileToken: turnstile.getToken });
+
+export const askTom = createAskTom({ tom, humanCheck: turnstile, fallbackEmail: about.email });

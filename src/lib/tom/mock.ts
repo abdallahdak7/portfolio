@@ -65,7 +65,7 @@ export const mockFetch: typeof fetch = async (input, init) => {
     id = uuid();
     conversations.set(id, 0);
   }
-  const turns = conversations.get(id)!;
+  const turns = conversations.get(id) ?? 0;
   if (turns >= TURN_LIMIT || has("/limit")) return rejections.turn_limit_reached();
   conversations.set(id, turns + 1);
 

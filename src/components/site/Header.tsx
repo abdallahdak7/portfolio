@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { profile } from "@/content";
+import { about } from "@/content";
 
 const links = [
   { href: "#experience", label: "Experience" },
-  { href: "#leadership", label: "Approach" },
+  { href: "#approach", label: "Approach" },
   { href: "#ai", label: "AI" },
   { href: "#spotlight", label: "Spotlight" },
   { href: "#ask-tom", label: "Ask Tom" },
@@ -28,7 +28,7 @@ export function Header() {
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8">
         <a href="#top" className="text-sm font-semibold tracking-tight">
-          {profile.name}
+          {about.name}
         </a>
         <nav aria-label="Primary" className="flex items-center gap-1 sm:gap-2">
           {links.map((l) => (
@@ -41,7 +41,7 @@ export function Header() {
             </a>
           ))}
           <a
-            href={profile.resume}
+            href={about.resume}
             target="_blank"
             rel="noreferrer"
             className="ml-1 rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-opacity hover:opacity-85"

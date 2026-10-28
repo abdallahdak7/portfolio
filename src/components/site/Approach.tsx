@@ -1,10 +1,10 @@
-import { leadershipIntro, principles, profile } from "@/content";
+import { approachIntro, principles, about } from "@/content";
 import { Section } from "./Section";
 
-export function Leadership() {
+export function Approach() {
   return (
-    <Section id="leadership" label="02 — Approach" title="How I work">
-      <p className="max-w-2xl text-[17px] leading-relaxed text-muted">{leadershipIntro}</p>
+    <Section id="approach" label="02 — Approach" title="How I work">
+      <p className="max-w-2xl text-[17px] leading-relaxed text-muted">{approachIntro}</p>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {principles.map((p, i) => (
           <article key={p.title} className="rounded-2xl border bg-surface p-6">
@@ -14,7 +14,7 @@ export function Leadership() {
           </article>
         ))}
       </div>
-      <p className="mt-8 max-w-2xl text-[15px] leading-relaxed text-muted">{profile.summary}</p>
+      <p className="mt-8 max-w-2xl text-[15px] leading-relaxed text-muted">{about.summary}</p>
     </Section>
   );
 }
