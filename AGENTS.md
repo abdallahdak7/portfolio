@@ -1,3 +1,7 @@
+## Tom's Worker
+
+Tom's backend is `abdallahdak7/speak-about-abdallah`, usually cloned at `../speak-about-abdallah`. Read it there for the facts this site restates: the Booking link, the API contract (`docs/api.md`) and its data handling.
+
 ## Agent skills
 
 ### Issue tracker

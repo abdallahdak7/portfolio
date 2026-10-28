@@ -86,6 +86,11 @@ export function AskTom() {
       >
         <div className="p-6 sm:p-8">
           <p className="max-w-2xl text-[15px] leading-relaxed text-muted">{content.intro}</p>
+          <p className="mt-2 text-xs text-subtle">
+            <a href="/privacy/#tom" className="link-underline">
+              How Tom handles your data
+            </a>
+          </p>
 
           {!started && suggestedQuestions.length > 0 && (
             <ul className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap" aria-label="Suggested questions">
@@ -240,6 +245,7 @@ function PillLink({ href, external, children }: { href: string; external?: boole
   return (
     <a
       href={href}
+      onClick={() => askTom.followLink(href)}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
       className="inline-flex items-center gap-1.5 rounded-full border bg-surface px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-foreground/30"
     >
@@ -254,7 +260,7 @@ function Linkified({ text }: { text: string }) {
     <>
       {linkify(text).map(({ text: part, href }, i) =>
         href ? (
-          <a key={i} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
+          <a key={i} href={href} onClick={() => askTom.followLink(href)} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
             {part}
           </a>
         ) : (

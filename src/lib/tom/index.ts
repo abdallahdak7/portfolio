@@ -1,4 +1,5 @@
 import { about } from "@/content";
+import { createAnalytics, type Analytics } from "@/lib/analytics";
 import { browserSpeechRecognition } from "@/lib/speech";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
@@ -18,6 +19,9 @@ export const turnstile: Turnstile = import.meta.env.DEV
   ? { attach() {}, preload() {}, getToken: mockTurnstileToken, onInteractive: () => () => {} }
   : createTurnstile(TURNSTILE_SITE_KEY);
 
+// Dev never counts towards the Audience figures.
+export const analytics: Analytics = createAnalytics(() => (import.meta.env.DEV ? undefined : window.umami));
+
 const tom = import.meta.env.DEV
   ? createTomClient({ baseUrl: BASE_URL, fetch: mockFetch, getTurnstileToken: turnstile.getToken })
   : createTomClient({ baseUrl: BASE_URL, getTurnstileToken: turnstile.getToken });
@@ -26,5 +30,7 @@ export const askTom = createAskTom({
   tom,
   humanCheck: turnstile,
   fallbackEmail: about.email,
+  bookingLink: about.bookingLink,
+  analytics,
   speechRecognition: browserSpeechRecognition(),
 });

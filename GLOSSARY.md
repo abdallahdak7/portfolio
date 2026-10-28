@@ -95,3 +95,29 @@ The link a Visitor can follow to schedule a call with Abdallah.
 **Fallback email**:
 Abdallah's email address, offered to a Visitor whenever Tom can't help.
 _Avoid_: contact email
+
+## Measuring the site
+
+**Audience figures**:
+Counts about Visitors as a group: how many came, from which Source, country and device, and how many made a Résumé download, started a Conversation or made a Contact. Never about one identifiable Visitor.
+_Avoid_: tracking, "who visited"
+
+**Source**:
+Where a Visitor came from: the referring site, such as LinkedIn, GitHub or a search engine.
+_Avoid_: channel, referral
+
+**Résumé download**:
+A Visitor opening or downloading the Résumé from the site.
+_Avoid_: CV download, résumé click
+
+**Privacy notice**:
+The page that tells Visitors what the site and Tom collect, why, who processes it and for how long.
+_Avoid_: privacy policy, cookie policy
+
+**Goal**:
+An outcome the site exists to produce, measured as a share of Visitors: Launch reach, Résumé interest, Tom adoption and Contact. Every Audience figure serves a Goal.
+_Avoid_: KPI, metric
+
+**Contact**:
+A Visitor reaching out to Abdallah: following the Booking link, emailing him, opening his LinkedIn, or sending a Message through Tom. The Goal the others lead to.
+_Avoid_: lead, conversion

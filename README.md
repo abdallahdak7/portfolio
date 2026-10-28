@@ -16,6 +16,20 @@ Personal portfolio. Vite + React + TypeScript + Tailwind, deployed to GitHub Pag
 
 The "Ask Tom" section chats with Tom, whose backend lives in [`abdallahdak7/speak-about-abdallah`](https://github.com/abdallahdak7/speak-about-abdallah) (API contract: `docs/api.md`). The Worker and the Turnstile widget only accept `https://abdallahdaknache.com`, so `npm run dev` uses a mock instead (`src/lib/tom/mock.ts`, which lists the keywords that trigger each error path). Check against the real backend only after deploying.
 
+## Audience figures
+
+Cookieless analytics with [Umami Cloud](https://cloud.umami.is), so there's no consent banner (see `docs/adr/0004-cookieless-audience-figures-no-consent-banner.md`). Events are defined only in `src/lib/analytics.ts`, and each serves a Goal. The script only counts on `abdallahdaknache.com`, and `npm run dev` sends nothing.
+
+To keep your own visits out, run this once in the browser console on the live site (in each browser you use):
+
+```js
+localStorage.setItem("umami.disabled", "1");
+```
+
+Remove it with `localStorage.removeItem("umami.disabled")`.
+
+The Privacy notice is a static page at `privacy/index.html`, with no JavaScript. Vite fills its `%about.<fact>%` placeholders from `src/content.ts` at build time, and it shares the theme tokens in `src/theme.css`. Update it whenever what the site or Tom's Worker collects changes.
+
 ## Resume
 
 Source: `resume/resume.html`. Regenerate the PDF by printing it to A4 (Chrome > Print > Save as PDF, margins: default) and saving it as `public/Abdallah_Daknache_Resume.pdf`.

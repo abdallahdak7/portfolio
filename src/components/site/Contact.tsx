@@ -1,10 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
 import { lookingFor, about } from "@/content";
+import { analytics } from "@/lib/tom";
+import { BookingLink } from "./BookingLink";
 
 export function Contact() {
   const links = [
-    { label: "LinkedIn", href: about.linkedin },
-    { label: "Résumé (PDF)", href: about.resume },
+    { label: "LinkedIn", href: about.linkedin, onClick: () => analytics.contact("linkedin", "contact") },
+    { label: "Résumé (PDF)", href: about.resume, onClick: () => analytics.resumeDownload("contact") },
     { label: "GitHub", href: about.github },
   ];
   const details = [
@@ -30,9 +32,15 @@ export function Contact() {
           ))}
         </dl>
 
+        <BookingLink
+          from="contact"
+          className="mt-10 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-85"
+        />
+        <p className="mt-6 text-sm text-subtle">Or email</p>
         <a
           href={`mailto:${about.email}`}
-          className="mt-10 inline-block text-lg font-medium text-accent underline decoration-accent/30 underline-offset-[6px] transition-colors hover:decoration-accent sm:text-2xl"
+          onClick={() => analytics.contact("email", "contact")}
+          className="mt-1 inline-block text-lg font-medium text-accent underline decoration-accent/30 underline-offset-[6px] transition-colors hover:decoration-accent sm:text-2xl"
         >
           {about.email}
         </a>
@@ -43,6 +51,7 @@ export function Contact() {
                 href={l.href}
                 target="_blank"
                 rel="noreferrer"
+                onClick={l.onClick}
                 className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
               >
                 {l.label} <ArrowUpRight className="h-3.5 w-3.5" />

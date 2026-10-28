@@ -2,8 +2,9 @@
 // Shared by the tests and the dev mock.
 
 export const FALLBACK_EMAIL = "abdallah.daknache@gmail.com";
-// Placeholder: the real Booking link comes from the Worker's rejection payloads.
-export const BOOKING_LINK = "https://calendly.com/example";
+// The Booking link the Worker sends (src/contact.json in abdallahdak7/speak-about-abdallah). Ask Tom counts it as a
+// Contact only if it matches the site's own Booking link, so a test fails if the two drift apart.
+export const BOOKING_LINK = "https://calendly.com/abdallah-daknache";
 
 export function json(status: number, body: unknown, headers: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {

@@ -1,6 +1,8 @@
-import { ArrowUpRight, Download, MapPin } from "lucide-react";
+import { ArrowUpRight, Download, Mail, MapPin } from "lucide-react";
 import { glance, about } from "@/content";
 import { keepTogether } from "@/lib/text";
+import { analytics } from "@/lib/tom";
+import { BookingLink } from "./BookingLink";
 
 export function Hero() {
   return (
@@ -21,18 +23,24 @@ export function Hero() {
         {keepTogether(about.headline)}
       </p>
 
-      <div className="reveal reveal-delay-3 mt-10 grid grid-cols-2 items-center gap-3 sm:flex sm:flex-wrap">
+      <div className="reveal reveal-delay-3 mt-10 grid grid-cols-3 items-center gap-3 sm:flex sm:flex-wrap">
+        <BookingLink
+          from="hero"
+          className="col-span-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
+        />
         <a
           href={`mailto:${about.email}`}
-          className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
+          onClick={() => analytics.contact("email", "hero")}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-surface px-3 py-2.5 sm:px-5 text-sm font-medium transition-colors hover:border-foreground/30"
         >
-          Get in touch
+          <Mail aria-hidden className="h-3.5 w-3.5" /> Email
         </a>
         <a
           href={about.resume}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-foreground/30"
+          onClick={() => analytics.resumeDownload("hero")}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-surface px-3 py-2.5 sm:px-5 text-sm font-medium transition-colors hover:border-foreground/30"
         >
           <Download className="h-3.5 w-3.5" /> Résumé
         </a>
@@ -40,11 +48,12 @@ export function Hero() {
           href={about.linkedin}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center justify-center gap-1 rounded-full border bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-foreground/30"
+          onClick={() => analytics.contact("linkedin", "hero")}
+          className="inline-flex items-center justify-center gap-1 rounded-full border bg-surface px-3 py-2.5 sm:px-5 text-sm font-medium transition-colors hover:border-foreground/30"
         >
           LinkedIn <ArrowUpRight className="h-3.5 w-3.5" />
         </a>
-        <span className="col-span-2 mt-1 inline-flex items-center gap-1.5 text-sm text-subtle sm:ml-1 sm:mt-0">
+        <span className="col-span-3 mt-1 inline-flex items-center gap-1.5 text-sm text-subtle sm:ml-1 sm:mt-0">
           <MapPin aria-hidden className="h-3.5 w-3.5" /> {about.location}
         </span>
       </div>

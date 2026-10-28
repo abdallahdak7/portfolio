@@ -1,0 +1,27 @@
+/* The theme tokens, shared by the site (index.css) and the Privacy notice (privacy.css). */
+
+:root {
+  --background: 40 20% 98%;
+  --surface: 0 0% 100%;
+  --foreground: 240 10% 8%;
+  --muted: 240 5% 36%;
+  --subtle: 240 4% 46%;
+  --border: 240 6% 90%;
+  --accent: 160 84% 28%;
+  --accent-soft: 160 60% 94%;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 240 8% 5%;
+    --surface: 240 6% 8%;
+    --foreground: 0 0% 96%;
+    --muted: 240 5% 68%;
+    --subtle: 240 4% 56%;
+    --border: 240 5% 15%;
+    --accent: 158 64% 52%;
+    --accent-soft: 160 40% 12%;
+    color-scheme: dark;
+  }
+}

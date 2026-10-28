@@ -1,0 +1,12 @@
+# Analytics are cookieless, so there is no consent banner; every event serves a Goal
+
+The site measures its Audience figures with Umami Cloud in the EU region, which sets no cookies and stores nothing on the Visitor's device, so under the ePrivacy rules there is nothing to ask consent for and the site shows no cookie banner; the Privacy notice (`/privacy/`) discloses what is measured instead. We chose this over cookie-based analytics (GA4, standard PostHog) behind an opt-in banner, because a banner that many EU Visitors decline under-counts exactly when it matters, at a launch, and adds friction for the hiring managers the site is for. We also rejected Cloudflare Web Analytics, which has no custom events, so Résumé downloads and Contacts couldn't be counted. The cost is that a returning Visitor can't reliably be told apart from a new one across days, which none of the Goals needs. Adding a cookie, local storage or an identifier for Visitors would bring back the need for consent, so it needs a banner and a new ADR.
+
+Every event serves one of these Goals, and no event is added unless it does. Targets are set after a two-week baseline:
+
+- **G1 Launch reach**: Visitors whose Source is LinkedIn, read from Umami's referrer report. LinkedIn's in-app browser often sends no referrer, so read it with direct Visitors at launch.
+- **G2 Résumé interest**: Résumé downloads ÷ Visitors (`resume-download`, by `from`).
+- **G3 Tom adoption**: Conversations started ÷ Visitors (`conversation-started`, once Tom first answers).
+- **G4 Contact**: the Booking link, email, LinkedIn or a Message through Tom (`contact`, by `via` and `from`).
+
+Event properties are fixed values only, never anything a Visitor typed. The Umami script is loaded from Umami's host rather than bundled, so it isn't a runtime dependency in the sense of `CODING_STANDARDS.md`: nothing imports it, and the site works fully when it's blocked. Its `data-domains` attribute limits it to `abdallahdaknache.com`, which keeps page views from `npm run dev` and previews out of the figures (the events are already dropped in dev); Abdallah excludes his own browsers with Umami's opt-out flag (see the README). The Privacy notice states facts about Tom's Worker (no stored history, a Conversation ID and counts that expire within 24 hours, Messages emailed through Cloudflare, Anthropic as the model provider), so a change to the Worker's data handling means a change to the notice.

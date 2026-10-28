@@ -1,4 +1,5 @@
 import { MAX_VISITOR_TURN, type TomClient, type ToolStatus, type Turn } from "./client";
+import type { Analytics } from "@/lib/analytics";
 import type { SpeechRecognition, SpeechRecognitionConstructor, SpeechRecognitionResults } from "@/lib/speech";
 import type { Turnstile } from "./turnstile";
 
@@ -57,12 +58,18 @@ export type AskTom = {
   stopDictation(): void;
   /** Sends one Visitor turn. Stops any Dictation first, so nothing heard late lands in the next draft. Resolves once Tom's reply has finished or the turn was withdrawn. */
   send(text: string): Promise<void>;
+  /** The Visitor followed a link in Ask Tom. A Booking link or email link counts as a Contact made from Tom. */
+  followLink(href: string): void;
 };
 
 export type AskTomOptions = {
   tom: TomClient;
   humanCheck: Pick<Turnstile, "onInteractive">;
   fallbackEmail: string;
+  /** Links to it in a Tom turn or a Notice count as Contacts. */
+  bookingLink: string;
+  /** Counts Conversations started, and Messages sent and links followed as Contacts. */
+  analytics: Pick<Analytics, "conversationStarted" | "contact">;
   /** The browser's speech recognition. Without it, Dictation is `unsupported`. */
   speechRecognition?: SpeechRecognitionConstructor;
 };
@@ -76,7 +83,7 @@ const DICTATION_PROBLEMS: Record<string, string> = {
 };
 const DICTATION_FAILED = "Speech recognition stopped. Type your question instead.";
 
-export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition }: AskTomOptions): AskTom {
+export function createAskTom({ tom, humanCheck, fallbackEmail, bookingLink, analytics, speechRecognition }: AskTomOptions): AskTom {
   let state: AskTomState = {
     suggestedQuestions: [],
     turns: [],
@@ -98,6 +105,8 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition
   let nextId = 0;
   let suggestions: Promise<void> | null = null;
   let recognition: SpeechRecognition | null = null;
+  /** Tom has answered in this Conversation, so it counts as started. */
+  let conversationStarted = false;
 
   const update = (change: Partial<Omit<AskTomState, Derived>>) => {
     const next = { ...state, ...change };
@@ -213,6 +222,7 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition
         onText: (piece) => updateTurn(tomId, (t) => ({ text: t.text + piece })),
         onToolStatus: (status) => {
           const text = messageProgressCopy[status];
+          if (status === "message_sent") analytics.contact("tom-message", "tom");
           update({ messageProgress: { status, text }, announcement: text });
         },
       });
@@ -229,6 +239,10 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition
       switch (result.kind) {
         case "done":
           stopStreaming();
+          if (!conversationStarted) {
+            conversationStarted = true;
+            analytics.conversationStarted();
+          }
           update({ announcement: `Tom: ${result.reply}` });
           return;
         case "error":
@@ -268,6 +282,11 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, speechRecognition
               showNotice(localNotice("Tom couldn't take that question. Try asking it another way, more briefly"));
           }
       }
+    },
+
+    followLink(href) {
+      if (href.startsWith("mailto:")) analytics.contact("email", "tom");
+      else if (href.startsWith(bookingLink)) analytics.contact("booking", "tom");
     },
   };
 }
