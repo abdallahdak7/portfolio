@@ -1,6 +1,7 @@
-import { FALLBACK_EMAIL, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
+import { FALLBACK_EMAIL, eventStream, json, profileLookup, rejections, streamError, type StreamEvent } from "./fixtures";
 
 // Dev-only stand-in for the Worker, which only accepts requests from https://abdallahdaknache.com.
+// Like the Worker's, the plain reply starts after a pause, while Tom decides whether to look anything up.
 // Put one of these words in a question to try a path:
 //   /rate     rate_limited (Retry-After: 30)
 //   /limit    turn_limit_reached (also happens on its own after 8 Visitor turns)
@@ -10,6 +11,7 @@ import { FALLBACK_EMAIL, eventStream, json, rejections, streamError, type Stream
 //   /cut      the stream closes with no done or error
 //   /slow     a slow reply
 //   /message  a Message for Abdallah that's sent; "/message fail" for one that isn't
+//   /lookup   a Profile lookup before the reply, and another partway through
 //   /invalid  invalid_request
 
 const TURN_LIMIT = 8;
@@ -95,9 +97,11 @@ export const mockFetch: typeof fetch = async (input, init) => {
 
   return eventStream(
     [
+      ...(has("/lookup") ? [{ ...profileLookup, delayMs: 800 }, ...words("Abdallah ", 1200)] : words("Abdallah ", 1000)),
+      ...words("is a Senior Mobile Engineer at Pepperstone, on the platform team behind its trading app. "),
+      ...(has("/lookup") ? [profileLookup, ...words("He ", 1200)] : words("He ")),
       ...words(
-        "Abdallah is a Senior Mobile Engineer at Pepperstone, on the platform team behind its trading app. " +
-          "He owns core initiatives across mobile and web, such as the shared sign-in module.\n\n" +
+        "owns core initiatives across mobile and web, such as the shared sign-in module.\n\n" +
           `(Mock reply ${turns + 1} of ${TURN_LIMIT}. You can reach him at ${FALLBACK_EMAIL}.)`,
       ),
       done,

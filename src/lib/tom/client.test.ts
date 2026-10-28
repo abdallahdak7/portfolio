@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createTomClient, type ToolStatus } from "./client";
-import { eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
+import { createTomClient, type MessageProgress } from "./client";
+import { eventStream, json, profileLookup, rejections, streamError, type StreamEvent } from "./fixtures";
 
 const BASE = "https://tom.test";
 const ID_1 = "11111111-1111-4111-8111-111111111111";
@@ -113,16 +113,45 @@ describe("sendTurn", () => {
         ID_1,
       ),
     );
-    const statuses: ToolStatus[] = [];
-    await client.startConversation().sendTurn("Pass this on", { onToolStatus: (s) => statuses.push(s) });
-    expect(statuses).toEqual(["sending_message", "message_sent"]);
+    const progress: MessageProgress[] = [];
+    await client.startConversation().sendTurn("Pass this on", { onMessageProgress: (p) => progress.push(p) });
+    expect(progress).toEqual(["sending", "sent"]);
+  });
+
+  it("reports each Profile lookup, and keeps only Tom's reply text in history", async () => {
+    const { client, calls } = setup(
+      eventStream(
+        [
+          profileLookup,
+          { event: "text_delta", data: { text: "Abdallah " } },
+          profileLookup,
+          ...reply("builds apps."),
+        ],
+        ID_1,
+      ),
+      eventStream(reply("ok"), ID_1),
+    );
+    const onProfileLookup = vi.fn();
+    const onMessageProgress = vi.fn();
+    const conversation = client.startConversation();
+    const result = await conversation.sendTurn("What does he do?", { onProfileLookup, onMessageProgress });
+    await conversation.sendTurn("And?");
+    expect(onProfileLookup).toHaveBeenCalledTimes(2);
+    expect(onMessageProgress).not.toHaveBeenCalled();
+    expect(result).toEqual({ kind: "done", reply: "Abdallah builds apps." });
+    expect(calls[1].body.history).toEqual([
+      { role: "visitor", text: "What does he do?" },
+      { role: "tom", text: "Abdallah builds apps." },
+    ]);
   });
 
   it("ignores an unknown tool_status", async () => {
     const { client } = setup(eventStream([{ event: "tool_status", data: { status: "launching" } }, ...reply("ok")], ID_1));
-    const statuses: ToolStatus[] = [];
-    await client.startConversation().sendTurn("hi", { onToolStatus: (s) => statuses.push(s) });
-    expect(statuses).toEqual([]);
+    const onProfileLookup = vi.fn();
+    const onMessageProgress = vi.fn();
+    await client.startConversation().sendTurn("hi", { onProfileLookup, onMessageProgress });
+    expect(onProfileLookup).not.toHaveBeenCalled();
+    expect(onMessageProgress).not.toHaveBeenCalled();
   });
 
   it("closes the response stream once Tom's reply is done", async () => {

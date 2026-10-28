@@ -4,7 +4,7 @@ import type { SpeechRecognition } from "@/lib/speech";
 import { createAnalytics } from "@/lib/analytics";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
-import { BOOKING_LINK, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
+import { BOOKING_LINK, eventStream, json, profileLookup, rejections, streamError, type StreamEvent } from "./fixtures";
 
 const ID = "11111111-1111-4111-8111-111111111111";
 const EMAIL = "abdallah.daknache@gmail.com";
@@ -273,9 +273,73 @@ describe("Ask Tom", () => {
     await askTom.send("Pass this on");
 
     expect(askTom.getState().messageProgress).toEqual({
-      status: "message_not_sent",
+      status: "not_sent",
       text: `Your message didn't go through. You can email Abdallah at ${EMAIL}.`,
     });
+  });
+
+  it("shows a Profile lookup apart from Tom's reply, until his next text", async () => {
+    const { askTom } = setup(
+      eventStream([profileLookup, { event: "text_delta", data: { text: "Abdallah " } }, profileLookup, ...reply("builds apps.")], ID),
+    );
+    const seen: [boolean, string][] = [];
+    askTom.subscribe(() => {
+      const { lookingUpProfile, turns } = askTom.getState();
+      const step: [boolean, string] = [lookingUpProfile, turns.at(-1)?.text ?? ""];
+      if (JSON.stringify(seen.at(-1)) !== JSON.stringify(step)) seen.push(step);
+    });
+
+    await askTom.send("What does he do?");
+
+    expect(seen).toEqual([
+      [false, ""],
+      [true, ""],
+      [false, "Abdallah "],
+      [true, "Abdallah "],
+      [false, "Abdallah builds apps."],
+    ]);
+  });
+
+  it("stops showing a Profile lookup when Tom's reply ends in an error", async () => {
+    const { askTom } = setup(eventStream([profileLookup, { event: "error", data: streamError }], ID));
+
+    await askTom.send("What does he do?");
+
+    expect(askTom.getState().lookingUpProfile).toBe(false);
+  });
+
+  it("keeps a Message's outcome showing through a later Profile lookup", async () => {
+    const { askTom } = setup(
+      eventStream(
+        [
+          { event: "tool_status", data: { status: "sending_message" } },
+          { event: "tool_status", data: { status: "message_sent" } },
+          profileLookup,
+          ...reply("Done."),
+        ],
+        ID,
+      ),
+    );
+
+    await askTom.send("Pass this on");
+
+    expect(askTom.getState()).toMatchObject({
+      lookingUpProfile: false,
+      messageProgress: { status: "sent", text: "Done. Your message is on its way to Abdallah." },
+    });
+  });
+
+  it("announces a Profile lookup", async () => {
+    const { askTom } = setup(eventStream([profileLookup, ...reply("He builds apps.")], ID));
+    const announced: string[] = [];
+    askTom.subscribe(() => {
+      const { announcement } = askTom.getState();
+      if (announced.at(-1) !== announcement) announced.push(announcement);
+    });
+
+    await askTom.send("What does he do?");
+
+    expect(announced).toEqual(["Tom is replying…", "Checking Abdallah's profile…", "Tom: He builds apps."]);
   });
 
   it("asks the Visitor to tick the box while the Human check needs them", () => {

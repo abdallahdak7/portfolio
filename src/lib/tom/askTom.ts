@@ -1,4 +1,4 @@
-import { MAX_VISITOR_TURN, type TomClient, type ToolStatus, type Turn } from "./client";
+import { MAX_VISITOR_TURN, type MessageProgress, type TomClient, type Turn } from "./client";
 import type { Analytics } from "@/lib/analytics";
 import type { SpeechRecognition, SpeechRecognitionConstructor, SpeechRecognitionResults } from "@/lib/speech";
 import type { Turnstile } from "./turnstile";
@@ -6,6 +6,7 @@ import type { Turnstile } from "./turnstile";
 // The state behind the Ask Tom section: the transcript, the draft, and whether the Visitor can send.
 
 export const HUMAN_CHECK_PROMPT = "Tick the box below so Tom can answer.";
+export const PROFILE_LOOKUP_STATUS = "Checking Abdallah's profile…";
 
 export type ShownTurn = Turn & { id: number; streaming: boolean };
 
@@ -23,8 +24,10 @@ export type AskTomState = {
   /** A Visitor turn is on its way to Tom. */
   busy: boolean;
   notice: Notice | null;
+  /** Tom is reading part of Abdallah's Profile, until his next text or the end of his reply. */
+  lookingUpProfile: boolean;
   /** How a Message for Abdallah is getting on, during the current Tom turn. */
-  messageProgress: { status: ToolStatus; text: string } | null;
+  messageProgress: { status: MessageProgress; text: string } | null;
   /** The Human check is waiting on the Visitor to tick its box. */
   humanCheckNeeded: boolean;
   /** The latest thing to tell a screen reader user. */
@@ -90,6 +93,7 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, bookingLink, anal
     draft: "",
     busy: false,
     notice: null,
+    lookingUpProfile: false,
     messageProgress: null,
     humanCheckNeeded: false,
     announcement: "",
@@ -119,18 +123,19 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, bookingLink, anal
     message: `${problem}, or email Abdallah at ${fallbackEmail}.`,
     fallbackEmail,
   });
-  const messageProgressCopy: Record<ToolStatus, string> = {
-    sending_message: "Passing your message to Abdallah…",
-    message_sent: "Done. Your message is on its way to Abdallah.",
-    message_not_sent: `Your message didn't go through. You can email Abdallah at ${fallbackEmail}.`,
+  const messageProgressCopy: Record<MessageProgress, string> = {
+    sending: "Passing your message to Abdallah…",
+    sent: "Done. Your message is on its way to Abdallah.",
+    not_sent: `Your message didn't go through. You can email Abdallah at ${fallbackEmail}.`,
   };
   const showNotice = (notice: Notice) => update({ notice, announcement: notice.message });
   const pauseFor = (seconds: number) => {
     update({ paused: true });
     setTimeout(() => update({ paused: false }), seconds * 1000);
   };
-  const updateTurn = (id: number, change: (turn: ShownTurn) => Partial<ShownTurn>) =>
-    update({ turns: state.turns.map((t) => (t.id === id ? { ...t, ...change(t) } : t)) });
+  const changeTurn = (id: number, change: (turn: ShownTurn) => Partial<ShownTurn>) =>
+    state.turns.map((t) => (t.id === id ? { ...t, ...change(t) } : t));
+  const updateTurn = (id: number, change: (turn: ShownTurn) => Partial<ShownTurn>) => update({ turns: changeTurn(id, change) });
 
   /** Drops the current Dictation without a word: whatever it hears from now on is ignored. */
   const abandonDictation = () => {
@@ -219,14 +224,15 @@ export function createAskTom({ tom, humanCheck, fallbackEmail, bookingLink, anal
       });
 
       const result = await conversation.sendTurn(message, {
-        onText: (piece) => updateTurn(tomId, (t) => ({ text: t.text + piece })),
-        onToolStatus: (status) => {
+        onText: (piece) => update({ turns: changeTurn(tomId, (t) => ({ text: t.text + piece })), lookingUpProfile: false }),
+        onProfileLookup: () => update({ lookingUpProfile: true, announcement: PROFILE_LOOKUP_STATUS }),
+        onMessageProgress: (status) => {
           const text = messageProgressCopy[status];
-          if (status === "message_sent") analytics.contact("tom-message", "tom");
+          if (status === "sent") analytics.contact("tom-message", "tom");
           update({ messageProgress: { status, text }, announcement: text });
         },
       });
-      update({ busy: false });
+      update({ busy: false, lookingUpProfile: false });
 
       const stopStreaming = () => updateTurn(tomId, () => ({ streaming: false }));
       // A Withdrawn turn never reached Tom: take it back out and return the text to the draft.
