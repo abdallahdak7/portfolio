@@ -4,6 +4,11 @@ Personal portfolio. Vite + React + TypeScript + Tailwind, deployed to GitHub Pag
 
 - Content lives in `src/content.ts`. Edit there to update experience, work, and skills.
 - `npm run dev` to develop, `npm run build` to type-check and build.
+- `npm test` runs the unit tests (Vitest).
+
+## Ask Tom
+
+The "Ask Tom" section chats with Tom, whose backend lives in [`abdallahdak7/speak-about-abdallah`](https://github.com/abdallahdak7/speak-about-abdallah) (API contract: `docs/api.md`). The Worker and the Turnstile widget only accept `https://abdallahdaknache.com`, so `npm run dev` uses a mock instead (`src/lib/tom/mock.ts`, which lists the keywords that trigger each error path). Check against the real backend only after deploying.
 
 ## Resume
 

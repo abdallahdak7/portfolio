@@ -7,6 +7,7 @@ import { Spotlight } from "@/components/site/Spotlight";
 import { AI } from "@/components/site/AI";
 import { Experience } from "@/components/site/Experience";
 import { Skills } from "@/components/site/Skills";
+import { AskTom } from "@/components/site/AskTom";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 
@@ -31,6 +32,7 @@ export default function App() {
         <AI />
         <Experience />
         <Skills />
+        <AskTom />
         <Contact />
       </main>
       <Footer />
