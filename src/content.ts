@@ -147,7 +147,7 @@ export const experience: Job[] = [
     company: "GO.MEDIA KG",
     location: "Germany · Remote",
     roles: [
-      { title: "Mid-Level Backend Engineer", period: "Jul 2020 — Aug 2021" },
+      { title: "Mid-Level Backend Engineer", period: "Jul 2020 — Feb 2021" },
       {
         title: "Junior Backend Engineer",
         period: "May 2019 — Jun 2020",
