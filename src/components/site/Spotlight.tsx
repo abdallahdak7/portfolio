@@ -4,7 +4,7 @@ import { Section } from "./Section";
 
 export function Spotlight() {
   return (
-    <Section id="spotlight" label="04 — Spotlight" title="What I've built">
+    <Section id="spotlight" label="04 — Spotlight" title="One example of what I can do">
       <article className="rounded-3xl border bg-surface p-6 sm:p-10">
         <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">{spotlight.tag}</p>
         <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{spotlight.title}</h3>
