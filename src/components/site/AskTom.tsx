@@ -200,8 +200,8 @@ export function AskTom() {
                 aria-label={listening ? "Stop speaking your question" : "Speak your question"}
                 aria-pressed={listening}
                 title="Your browser may send the audio to its speech service to turn it into text."
-                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-30 ${
-                  listening ? "border-accent/40 bg-accent-soft text-accent" : "bg-background hover:border-foreground/30"
+                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-30 ${
+                  listening ? "bg-accent-soft text-accent" : "bg-foreground/5 hover:bg-foreground/10"
                 }`}
               >
                 {listening ? <Square aria-hidden className="h-3.5 w-3.5 fill-current" /> : <Mic aria-hidden className="h-4 w-4" />}
@@ -222,7 +222,7 @@ export function AskTom() {
                 ? "Questions are paused for now. Try again later."
                 : listening
                   ? "Listening… It stops when you pause. Check the text, then send."
-                  : (dictationProblem ?? "Up to 8 questions per chat. Press Enter to send.")}
+                  : (dictationProblem ?? "Conversations are short, so ask what matters most.")}
             </span>
             {remaining <= 80 && <span aria-live="polite">{remaining} characters left</span>}
           </p>
