@@ -9,6 +9,8 @@ type RenderOptions = {
   "error-callback": () => boolean | void;
   "expired-callback": () => void;
   "timeout-callback": () => void;
+  "before-interactive-callback": () => void;
+  "after-interactive-callback": () => void;
 };
 
 type TurnstileApi = {
@@ -52,17 +54,22 @@ export type Turnstile = {
   /** Starts loading the script ahead of the first request. */
   preload(): void;
   getToken(): Promise<string>;
+  /** Tells the listener when the challenge starts and stops waiting on the Visitor. Returns an unsubscribe. */
+  onInteractive(listener: (needed: boolean) => void): () => void;
 };
 
 export function createTurnstile(sitekey: string): Turnstile {
   let container: HTMLElement | null = null;
   let widgetId: string | null = null;
   let pending: { resolve: (token: string) => void; reject: (e: Error) => void; timer: number } | null = null;
+  const listeners = new Set<(needed: boolean) => void>();
+  const setInteractive = (needed: boolean) => listeners.forEach((l) => l(needed));
 
   const settle = (outcome: { token: string } | { error: string }) => {
     const p = pending;
     pending = null;
     if (!p) return;
+    setInteractive(false);
     clearTimeout(p.timer);
     if ("token" in outcome) p.resolve(outcome.token);
     else p.reject(new Error(outcome.error));
@@ -104,6 +111,8 @@ export function createTurnstile(sitekey: string): Turnstile {
           },
           "expired-callback": () => {},
           "timeout-callback": () => settle({ error: "challenge timed out" }),
+          "before-interactive-callback": () => setInteractive(true),
+          "after-interactive-callback": () => setInteractive(false),
         });
       } else {
         // Tokens are single-use: clear the last one before solving again.
@@ -111,6 +120,11 @@ export function createTurnstile(sitekey: string): Turnstile {
       }
       api.execute(widgetId);
       return token;
+    },
+
+    onInteractive(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
   };
 }

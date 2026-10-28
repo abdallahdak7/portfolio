@@ -11,7 +11,7 @@ const TURNSTILE_SITE_KEY = "0x4AAAAAAFpvj-Xu069Vu_di";
 // The Worker and the Turnstile widget only accept https://abdallahdaknache.com, so dev runs against
 // a mock (see ./mock.ts). `import.meta.env.DEV` is false in builds, which drops the mock from the bundle.
 export const turnstile: Turnstile = import.meta.env.DEV
-  ? { attach() {}, preload() {}, getToken: mockTurnstileToken }
+  ? { attach() {}, preload() {}, getToken: mockTurnstileToken, onInteractive: () => () => {} }
   : createTurnstile(TURNSTILE_SITE_KEY);
 
 export const tom = import.meta.env.DEV

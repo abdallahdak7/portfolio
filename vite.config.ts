@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { configDefaults, defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => ({
     },
   },
   base: "/",
+  test: {
+    // Agent worktrees hold full copies of the repo; don't run their tests too.
+    exclude: [...configDefaults.exclude, ".claude/**"],
+  },
   plugins: [react()],
   resolve: {
     alias: {
