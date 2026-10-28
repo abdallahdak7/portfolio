@@ -164,9 +164,9 @@ export const skills = [
 ];
 
 export const askTom = {
-  title: "Questions? Ask Tom",
+  title: "Got a question? Ask Tom",
   intro:
-    "Tom is an AI assistant that answers questions about my work and experience, using a profile I've approved. He can also pass a message on to me or share a link to book a call.",
+    "Tom is an AI assistant who answers questions about my work and experience, using a profile I've reviewed and approved. He can also pass a message on to me or share a link to book a call. Tom can get things wrong, so check anything important with me directly.",
 };
 
 export const lookingFor = {

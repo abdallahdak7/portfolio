@@ -9,9 +9,9 @@ type ShownTurn = Turn & { id: number; streaming?: boolean };
 type Notice = { message: string; fallbackEmail?: string; bookingLink?: string };
 
 const toolStatusCopy: Record<ToolStatus, string> = {
-  sending_message: "Sending your message to Abdallah…",
-  message_sent: "Message sent to Abdallah.",
-  message_not_sent: "Your message couldn't be sent.",
+  sending_message: "Passing your message to Abdallah…",
+  message_sent: "Done. Your message is on its way to Abdallah.",
+  message_not_sent: `Your message didn't go through. You can email Abdallah at ${profile.email}.`,
 };
 
 /** For failures without a server payload, so the Fallback email comes from the site's own content. */
@@ -131,7 +131,7 @@ export function AskTom() {
       case "failed":
         if (result.partialReply) stopStreaming();
         else withdraw();
-        showNotice(localNotice("Tom couldn't be reached. Check your connection and try again"));
+        showNotice(localNotice("Tom can't be reached right now. Check your connection and try again"));
         return;
       case "invalid":
         withdraw();
@@ -152,7 +152,7 @@ export function AskTom() {
             showNotice({ message: result.message, fallbackEmail: result.fallbackEmail });
             return;
           default:
-            showNotice(localNotice(`Tom couldn't read that question. Try rephrasing it in under ${MAX_VISITOR_TURN} characters`));
+            showNotice(localNotice("Tom couldn't take that question. Try asking it another way, more briefly"));
         }
     }
   }
@@ -299,9 +299,9 @@ export function AskTom() {
           </div>
           <p id="ask-tom-hint" className="mt-2 flex justify-between gap-4 px-1 font-mono text-[11px] text-subtle">
             <span>
-              {blockedUntil ? "Please wait a moment before asking again." : "Up to 8 questions per conversation. Enter to send."}
+              {blockedUntil ? "Questions are paused for now. Try again later." : "Up to 8 questions per chat. Press Enter to send."}
             </span>
-            {remaining <= 80 && <span aria-live="polite">{remaining} left</span>}
+            {remaining <= 80 && <span aria-live="polite">{remaining} characters left</span>}
           </p>
         </form>
       </div>
