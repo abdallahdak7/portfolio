@@ -32,9 +32,11 @@
       }
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/geist.css" />
+
+    <!-- Cookieless Audience figures (docs/adr/0004). data-domains keeps dev and previews out of the numbers. -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="aa140d23-1f7d-4a46-bd57-f98a95cd2f11" data-domains="abdallahdaknache.com"></script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUp, CalendarDays, Loader2, Mail, Mic, Square } from "lucide-react";
 import { askTom as content } from "@/content";
-import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, askTom, turnstile } from "@/lib/tom";
+import { contactVia } from "@/lib/analytics";
+import { HUMAN_CHECK_PROMPT, MAX_VISITOR_TURN, analytics, askTom, turnstile } from "@/lib/tom";
 import { linkify } from "@/lib/text";
 import { Section } from "./Section";
 
@@ -86,6 +87,11 @@ export function AskTom() {
       >
         <div className="p-6 sm:p-8">
           <p className="max-w-2xl text-[15px] leading-relaxed text-muted">{content.intro}</p>
+          <p className="mt-2 text-xs text-subtle">
+            <a href="/privacy/#tom" className="link-underline">
+              How Tom handles your data
+            </a>
+          </p>
 
           {!started && suggestedQuestions.length > 0 && (
             <ul className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap" aria-label="Suggested questions">
@@ -236,10 +242,17 @@ export function AskTom() {
   );
 }
 
+/** Links in Ask Tom are where Tom earns a Contact. */
+const countContact = (href: string) => {
+  const via = contactVia(href);
+  if (via) analytics.contact(via, "tom");
+};
+
 function PillLink({ href, external, children }: { href: string; external?: boolean; children: ReactNode }) {
   return (
     <a
       href={href}
+      onClick={() => countContact(href)}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
       className="inline-flex items-center gap-1.5 rounded-full border bg-surface px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-foreground/30"
     >
@@ -254,7 +267,7 @@ function Linkified({ text }: { text: string }) {
     <>
       {linkify(text).map(({ text: part, href }, i) =>
         href ? (
-          <a key={i} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
+          <a key={i} href={href} onClick={() => countContact(href)} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer" className="link-underline text-accent">
             {part}
           </a>
         ) : (

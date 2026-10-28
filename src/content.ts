@@ -6,6 +6,7 @@ export const about = {
   availability: "Open to Lead and Senior Mobile roles",
   email: "abdallah.daknache@gmail.com",
   linkedin: "https://www.linkedin.com/in/abdallah-daknache/",
+  bookingLink: "https://calendly.com/abdallah-daknache",
   github: "https://github.com/abdallahdak7",
   resume: "/Abdallah_Daknache_Resume.pdf",
   headline:

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SpeechRecognition } from "@/lib/speech";
+import { createAnalytics } from "@/lib/analytics";
 import { createAskTom } from "./askTom";
 import { createTomClient } from "./client";
 import { BOOKING_LINK, eventStream, json, rejections, streamError, type StreamEvent } from "./fixtures";
@@ -63,6 +64,7 @@ function setupWithSpeech(...responses: (Response | Error)[]) {
   const askTom = createAskTom({
     tom,
     fallbackEmail: EMAIL,
+    analytics: createAnalytics(() => undefined),
     humanCheck: { onInteractive: () => () => {} },
     speechRecognition: speech.SpeechRecognition,
   });
@@ -75,10 +77,12 @@ function setup(...responses: (Response | Error)[]) {
 
 function setupWithToken(getTurnstileToken: () => Promise<string>, ...responses: (Response | Error)[]) {
   let humanCheckListener: (needed: boolean) => void = () => {};
+  const umami = { track: vi.fn() };
   const tom = createTomClient({ baseUrl: "https://tom.test", fetch: scriptedFetch(responses), getTurnstileToken });
   const askTom = createAskTom({
     tom,
     fallbackEmail: EMAIL,
+    analytics: createAnalytics(() => umami),
     humanCheck: {
       onInteractive: (listener) => {
         humanCheckListener = listener;
@@ -86,7 +90,7 @@ function setupWithToken(getTurnstileToken: () => Promise<string>, ...responses: 
       },
     },
   });
-  return { askTom, humanCheckNeeded: (needed: boolean) => humanCheckListener(needed) };
+  return { askTom, humanCheckNeeded: (needed: boolean) => humanCheckListener(needed), tracked: () => umami.track.mock.calls };
 }
 
 afterEach(() => {
@@ -307,6 +311,66 @@ describe("Ask Tom", () => {
     await askTom.send("Pass this on");
 
     expect(announced).toEqual(["Tom is replying…", "Passing your message to Abdallah…", "Tom: Sent."]);
+  });
+});
+
+describe("Audience figures", () => {
+  it("counts a Conversation as started once Tom first answers, however many Exchanges follow", async () => {
+    const { askTom, tracked } = setup(eventStream(reply("He's a mobile engineer."), ID), eventStream(reply("At Pepperstone."), ID));
+
+    await askTom.send("What does he do?");
+    await askTom.send("Where?");
+
+    expect(tracked()).toEqual([["conversation-started", {}]]);
+  });
+
+  it("doesn't count a Conversation Tom never answered in", async () => {
+    const refused = setup(rejections.invalid_request());
+    const paused = setup(rejections.rate_limited());
+    const unverified = setupWithToken(async () => {
+      throw new Error("challenge failed");
+    });
+
+    for (const { askTom } of [refused, paused, unverified]) await askTom.send("hi");
+
+    expect([refused.tracked(), paused.tracked(), unverified.tracked()]).toEqual([[], [], []]);
+  });
+
+  it("counts a sent Message as a Contact from Tom", async () => {
+    const { askTom, tracked } = setup(
+      eventStream(
+        [
+          { event: "tool_status", data: { status: "sending_message" } },
+          { event: "tool_status", data: { status: "message_sent" } },
+          ...reply("Done."),
+        ],
+        ID,
+      ),
+    );
+
+    await askTom.send("Tell him Jane from Acme wants to talk");
+
+    expect(tracked()).toContainEqual(["contact", { via: "tom-message", from: "tom" }]);
+  });
+
+  it("doesn't count a Message that didn't go through", async () => {
+    const { askTom, tracked } = setup(
+      eventStream([{ event: "tool_status", data: { status: "message_not_sent" } }, ...reply("Sorry.")], ID),
+    );
+
+    await askTom.send("Pass this on");
+
+    expect(tracked()).not.toContainEqual(expect.arrayContaining(["contact"]));
+  });
+
+  it("never sends what the Visitor wrote", async () => {
+    const { askTom, tracked } = setup(
+      eventStream([{ event: "tool_status", data: { status: "message_sent" } }, ...reply("Done.")], ID),
+    );
+
+    await askTom.send("Tell him Jane from Acme wants to talk");
+
+    expect(JSON.stringify(tracked())).not.toContain("Jane");
   });
 });
 

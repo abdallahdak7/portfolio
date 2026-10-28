@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { about } from "@/content";
+import { analytics } from "@/lib/tom";
 
 const links = [
   { href: "#experience", label: "Experience" },
@@ -44,6 +45,7 @@ export function Header() {
             href={about.resume}
             target="_blank"
             rel="noreferrer"
+            onClick={() => analytics.resumeDownload("header")}
             className="ml-1 rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
           >
             Résumé
